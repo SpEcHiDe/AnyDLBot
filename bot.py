@@ -9,7 +9,8 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(leve
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 # the Telegram trackings
-# from botan import Botan
+from botan import Botan
+
 import subprocess
 import requests
 import os
@@ -27,12 +28,12 @@ def error(bot, update, error):
 
 
 def start(bot, update):
-    # botan.track(Config.BOTAN_IO_TOKEN, update.message, update.message.chat_id)
+    botan.track(Config.BOTAN_IO_TOKEN, update.message, update.message.chat_id)
     bot.send_message(chat_id=update.message.chat_id, text=Translation.START_TEXT, reply_to_message_id=update.message.message_id)
 
 
 def echo(bot, update):
-    # botan.track(Config.BOTAN_IO_TOKEN, update.message, update.message.chat_id)
+    botan.track(Config.BOTAN_IO_TOKEN, update.message, update.message.chat_id)
     if(update.message.text.startswith("http")):
         url = update.message.text
         t_response = subprocess.check_output(["youtube-dl", "-j", url])
@@ -90,7 +91,7 @@ def button(bot, update):
 
 
 if __name__ == "__main__" :
-    # botan = Botan()
+    botan = Botan()
     # create download directory, if not exist
     if not os.path.isdir(Config.DOWNLOAD_LOCATION):
         os.makedirs(Config.DOWNLOAD_LOCATION)
