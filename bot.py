@@ -28,12 +28,12 @@ def error(bot, update, error):
 
 
 def start(bot, update):
-    botan.track(Config.BOTAN_IO_TOKEN, update.message, update.message.chat_id)
+    # botan.track(Config.BOTAN_IO_TOKEN, update.message, update.message.chat_id)
     bot.send_message(chat_id=update.message.chat_id, text=Translation.START_TEXT, reply_to_message_id=update.message.message_id)
 
 
 def echo(bot, update):
-    botan.track(Config.BOTAN_IO_TOKEN, update.message, update.message.chat_id)
+    # botan.track(Config.BOTAN_IO_TOKEN, update.message, update.message.chat_id)
     if(update.message.text.startswith("http")):
         url = update.message.text
         t_response = subprocess.check_output(["youtube-dl", "-j", url])
@@ -56,38 +56,43 @@ def button(bot, update):
     query = update.callback_query
     youtube_dl_format = query.data
     youtube_dl_url = query.message.reply_to_message.text
-    download_directory = Config.DOWNLOAD_LOCATION + "/" + str(query.message.chat_id) + ".mp4"
+    t_response = subprocess.check_output(["youtube-dl", "-j", youtube_dl_url])
+    x_reponse = t_response.decode("UTF-8")
+    response_json = json.loads(x_reponse)
+    download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"]) + ""
     bot.edit_message_text(
         text="Trying to download link",
         chat_id=query.message.chat_id,
         message_id=query.message.message_id
     )
-    if os.path.exists(download_directory):
+    # if os.path.exists(download_directory):
+    #    bot.edit_message_text(
+    #        text="Free users can download only 1 URL per day",
+    #        chat_id=query.message.chat_id,
+    #        message_id=query.message.message_id
+    #    )
+    # else:
+    t_response = subprocess.check_output(["youtube-dl", "-f", youtube_dl_format, youtube_dl_url, "-o", download_directory])
+    bot.edit_message_text(
+        text="Trying to upload file",
+        chat_id=query.message.chat_id,
+        message_id=query.message.message_id
+    )
+    file_size = os.stat(download_directory).st_size
+    if file_size > Config.MAX_FILE_SIZE:
         bot.edit_message_text(
-            text="Free users can download only 1 URL per day",
+            text="size greater than maximum allowed size",
             chat_id=query.message.chat_id,
             message_id=query.message.message_id
         )
+        # just send a link
+        file_link = Config.HTTP_DOMAIN + "" + download_directory.replace("./", "")
+        bot.send_message(chat_id=query.message.chat_id, text=file_link)
     else:
-        t_response = subprocess.check_output(["youtube-dl", "-f", youtube_dl_format, youtube_dl_url, "-o", download_directory])
-        bot.edit_message_text(
-            text="Trying to upload file",
-            chat_id=query.message.chat_id,
-            message_id=query.message.message_id
-        )
-        file_size = os.stat(download_directory).st_size
-        if file_size > Config.MAX_FILE_SIZE:
-            bot.edit_message_text(
-                text="size greater than maximum allowed size",
-                chat_id=query.message.chat_id,
-                message_id=query.message.message_id
-            )
-            # just send a link
-            file_link = Config.HTTP_DOMAIN + "" + download_directory.replace("./", "")
-            bot.send_message(chat_id=query.message.chat_id, text=file_link)
-        else:
-            # try to upload file
-            bot.send_document(chat_id=query.message.chat_id, document=open(download_directory, 'rb'))
+        # try to upload file
+        bot.send_document(chat_id=query.message.chat_id, document=open(download_directory, 'rb'), caption="@AnyDLBot")
+        # TODO: delete the file after successful upload
+        # os.remove(download_directory)
 
 
 if __name__ == "__main__" :

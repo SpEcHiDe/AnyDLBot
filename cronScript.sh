@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 cd "/media/FIFTYGB/two/sitein.org/videos"
-#rm -rf "./DOWNLOADS"
+rm -rf "./DOWNLOADS"
 mkdir -p "./DOWNLOADS"
 
