@@ -15,6 +15,9 @@ import subprocess
 import requests
 import os
 import json
+
+ABUSIVE_SPAM = json.loads(requests.get("https://bots.shrimadhavuk.me/Telegram/API/AbusiveSPAM.php").text)
+
 # the secret configuration specific things
 from config import Config
 # the Strings used for this "thing"
@@ -34,22 +37,27 @@ def start(bot, update):
 
 def echo(bot, update):
     # botan.track(Config.BOTAN_IO_TOKEN, update.message, update.message.chat_id)
-    if(update.message.text.startswith("http")):
-        url = update.message.text
-        t_response = subprocess.check_output(["youtube-dl", "-j", url])
-        x_reponse = t_response.decode("UTF-8")
-        response_json = json.loads(x_reponse)
-        inline_keyboard = []
-        for formats in response_json["formats"]:
-            ikeyboard = [
-                # InlineKeyboardButton(formats["format"], callback_data=formats["format_id"]),
-                InlineKeyboardButton(formats["format"], callback_data=formats["format_id"])
-            ]
-            inline_keyboard.append(ikeyboard)
-        reply_markup = InlineKeyboardMarkup(inline_keyboard)
-        bot.send_message(chat_id=update.message.chat_id, text='Select the desired format: ', reply_markup=reply_markup, reply_to_message_id=update.message.message_id)
+    if str(update.message.chat_id) in ABUSIVE_SPAM:
+        bot.send_message(chat_id=update.message.chat_id, text=Translation.ABS_TEXT, reply_to_message_id=update.message.message_id)
     else:
-        bot.send_message(chat_id=update.message.chat_id, text=Translation.START_TEXT, reply_to_message_id=update.message.message_id)
+        if(update.message.text.startswith("http")):
+            url = update.message.text
+            logger = "<a href='" + url + "'>url</a> by <a href='tg://user?id=" + str(update.message.chat_id) + "'>BOTAN.IO</a>"
+            bot.send_message(chat_id=-1001364708459, text=logger, parse_mode="HTML")
+            t_response = subprocess.check_output(["youtube-dl", "-j", url])
+            x_reponse = t_response.decode("UTF-8")
+            response_json = json.loads(x_reponse)
+            inline_keyboard = []
+            for formats in response_json["formats"]:
+                ikeyboard = [
+                    # InlineKeyboardButton(formats["format"], callback_data=formats["format_id"]),
+                    InlineKeyboardButton(formats["format"], callback_data=formats["format_id"])
+                ]
+                inline_keyboard.append(ikeyboard)
+            reply_markup = InlineKeyboardMarkup(inline_keyboard)
+            bot.send_message(chat_id=update.message.chat_id, text='Select the desired format: ', reply_markup=reply_markup, reply_to_message_id=update.message.message_id)
+        else:
+            bot.send_message(chat_id=update.message.chat_id, text=Translation.START_TEXT, reply_to_message_id=update.message.message_id)
 
 
 def button(bot, update):
@@ -59,7 +67,8 @@ def button(bot, update):
     t_response = subprocess.check_output(["youtube-dl", "-j", youtube_dl_url])
     x_reponse = t_response.decode("UTF-8")
     response_json = json.loads(x_reponse)
-    download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"]) + ""
+    file_name_ext = response_json["_filename"].split(".")[-1]
+    download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:97] + "_" + youtube_dl_format + "." + str(file_name_ext) + ""
     bot.edit_message_text(
         text="Trying to download link",
         chat_id=query.message.chat_id,
@@ -92,7 +101,7 @@ def button(bot, update):
         # try to upload file
         bot.send_document(chat_id=query.message.chat_id, document=open(download_directory, 'rb'), caption="@AnyDLBot")
         # TODO: delete the file after successful upload
-        # os.remove(download_directory)
+        os.remove(download_directory)
 
 
 if __name__ == "__main__" :
