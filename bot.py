@@ -81,8 +81,8 @@ def echo(bot, update):
                     # print("Status : FAIL", exc.returncode, exc.output)
                     bot.send_message(chat_id=update.message.chat_id, text=exc.output.decode("UTF-8"))
                 else:
-                    x_reponse = t_response.decode("UTF-8").replace("\'", "\"")
-                    # https://stackoverflow.com/a/40060181
+                    x_reponse = t_response.decode("UTF-8")
+                    # print(x_reponse)
                     response_json = json.loads(x_reponse)
                     inline_keyboard = []
                     for formats in response_json["formats"]:
@@ -114,7 +114,8 @@ def button(bot, update):
     query = update.callback_query
     youtube_dl_format = query.data
     # ggyyy = bot.getChatMember("@MalayalamTrollVoice", query.message.chat_id)
-    if "hls" not in youtube_dl_format: #ggyyy.status:
+    # if "hls" not in youtube_dl_format: #ggyyy.status:
+    if "1" != "2":
         youtube_dl_url = query.message.reply_to_message.text
         t_response = subprocess.check_output(["youtube-dl", "-j", youtube_dl_url])
         x_reponse = t_response.decode("UTF-8")
@@ -132,7 +133,7 @@ def button(bot, update):
             t_response = subprocess.check_output(["youtube-dl", "--extract-audio", "--audio-format", "mp3", "--audio-quality", mp3_audio_quality, youtube_dl_url, "-o", download_directory])
         else:
             download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:49] + "_" + youtube_dl_format + "." + "mp4" + ""
-            t_response = subprocess.check_output(["youtube-dl", "-f", youtube_dl_format, "--recode-video", "mp4", youtube_dl_url, "-o", download_directory])
+            t_response = subprocess.check_output(["youtube-dl", "-f", youtube_dl_format, "--hls-prefer-ffmpeg", "--recode-video", "mp4", youtube_dl_url, "-o", download_directory])
         bot.edit_message_text(
             text="trying to upload",
             chat_id=query.message.chat_id,
@@ -182,7 +183,7 @@ def button(bot, update):
             )
     else:
         bot.edit_message_text(
-            text="Premium Link Detected. Please /upgrade",
+            text=Translation.ABS_TEXT,
             chat_id=query.message.chat_id,
             message_id=query.message.message_id
         )
