@@ -82,6 +82,12 @@ def echo(bot, update):
                             InlineKeyboardButton(format_string + "(" + approx_file_size + ")", callback_data=format_id)
                         ]
                         inline_keyboard.append(ikeyboard)
+                    inline_keyboard.append([
+                        InlineKeyboardButton("MP3 " + "(" + "medium" + ")", callback_data="MP3:5")
+                    ])
+                    inline_keyboard.append([
+                        InlineKeyboardButton("MP3 " + "(" + "best" + ")", callback_data="MP3:0")
+                    ])
                     reply_markup = InlineKeyboardMarkup(inline_keyboard)
                     bot.send_message(chat_id=update.message.chat_id, text='Select the desired format: (file size might be approximate) ', reply_markup=reply_markup, reply_to_message_id=update.message.message_id)
             else:
@@ -100,9 +106,8 @@ def button(bot, update):
         x_reponse = t_response.decode("UTF-8")
         response_json = json.loads(x_reponse)
         file_name_ext = response_json["_filename"].split(".")[-1]
-        download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:97] + "_" + youtube_dl_format + "." + str(file_name_ext) + ""
         bot.edit_message_text(
-            text="Trying to download link",
+            text="trying to download",
             chat_id=query.message.chat_id,
             message_id=query.message.message_id
         )
@@ -113,9 +118,16 @@ def button(bot, update):
         #        message_id=query.message.message_id
         #    )
         # else:
-        t_response = subprocess.check_output(["youtube-dl", "-f", youtube_dl_format, youtube_dl_url, "-o", download_directory])
+        download_directory = ""
+        if "MP3" in youtube_dl_format:
+            mp3, mp3_audio_quality = youtube_dl_format.split(":")
+            download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:97] + "_" + youtube_dl_format + "." + "mp3" + ""
+            t_response = subprocess.check_output(["youtube-dl", "--extract-audio", "--audio-format", "mp3", "--audio-quality", mp3_audio_quality, youtube_dl_url, "-o", download_directory])
+        else:
+            download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:97] + "_" + youtube_dl_format + "." + str(file_name_ext) + ""
+            t_response = subprocess.check_output(["youtube-dl", "-f", youtube_dl_format, youtube_dl_url, "-o", download_directory])
         bot.edit_message_text(
-            text="Trying to upload file",
+            text="trying to upload",
             chat_id=query.message.chat_id,
             message_id=query.message.message_id
         )
@@ -127,13 +139,23 @@ def button(bot, update):
                 message_id=query.message.message_id
             )
             # just send a link
-            file_link = Config.HTTP_DOMAIN + "" + download_directory.replace("./", "")
-            bot.send_message(chat_id=query.message.chat_id, text=file_link)
+            file_link = Config.HTTP_DOMAIN + "" + download_directory.replace("/media/FIFTYGB/two/sitein.org/videos/", "")
+            bot.edit_message_text(
+                text="Please download the following [link](" + file_link + ") using any download manager or @UrlUploadBot",
+                chat_id=query.message.chat_id,
+                message_id=query.message.message_id,
+                parse_mode="Markdown"
+            )
         else:
             # try to upload file
             bot.send_document(chat_id=query.message.chat_id, document=open(download_directory, 'rb'), caption="@AnyDLBot")
             # TODO: delete the file after successful upload
             os.remove(download_directory)
+            bot.edit_message_text(
+                text="uploaded successfully",
+                chat_id=query.message.chat_id,
+                message_id=query.message.message_id
+            )
     else:
         bot.edit_message_text(
             text="Premium Link Detected. Please /upgrade",
