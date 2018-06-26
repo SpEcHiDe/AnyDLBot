@@ -28,6 +28,8 @@ from translation import Translation
 def humanbytes(size):
     # https://stackoverflow.com/a/49361727/4723940
     #2**10 = 1024
+    if not size:
+      return ""
     power = 2**10
     n = 0
     Dic_powerN = {0 : ' ', 1: 'Ki', 2: 'Mi', 3: 'Gi', 4: 'Ti'}
@@ -124,8 +126,8 @@ def button(bot, update):
             download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:97] + "_" + youtube_dl_format + "." + "mp3" + ""
             t_response = subprocess.check_output(["youtube-dl", "--extract-audio", "--audio-format", "mp3", "--audio-quality", mp3_audio_quality, youtube_dl_url, "-o", download_directory])
         else:
-            download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:97] + "_" + youtube_dl_format + "." + str(file_name_ext) + ""
-            t_response = subprocess.check_output(["youtube-dl", "-f", youtube_dl_format, youtube_dl_url, "-o", download_directory])
+            download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:49] + "_" + youtube_dl_format + "." + "mp4" + ""
+            t_response = subprocess.check_output(["youtube-dl", "-f", youtube_dl_format, "--recode-video", "mp4", youtube_dl_url, "-o", download_directory])
         bot.edit_message_text(
             text="trying to upload",
             chat_id=query.message.chat_id,
@@ -141,14 +143,17 @@ def button(bot, update):
             # just send a link
             file_link = Config.HTTP_DOMAIN + "" + download_directory.replace("/media/FIFTYGB/two/sitein.org/videos/", "")
             bot.edit_message_text(
-                text="Please download the following [link](" + file_link + ") using any download manager or @UrlUploadBot",
+                text="Please download the following [link](" + file_link + ") using any download manager or @UrlUploadBot. Link will expire after 24 hours.",
                 chat_id=query.message.chat_id,
                 message_id=query.message.message_id,
                 parse_mode="Markdown"
             )
         else:
             # try to upload file
-            bot.send_document(chat_id=query.message.chat_id, document=open(download_directory, 'rb'), caption="@AnyDLBot")
+            if download_directory.endswith("mp3"):
+                bot.send_audio(chat_id=query.message.chat_id, audio=open(download_directory, 'rb'), caption="@AnyDLBot")
+            else:
+                bot.send_video(chat_id=query.message.chat_id, video=open(download_directory, 'rb'), caption="@AnyDLBot", supports_streaming=True)
             # TODO: delete the file after successful upload
             os.remove(download_directory)
             bot.edit_message_text(
