@@ -4,6 +4,7 @@
 # the logging things
 import logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # the PTB
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
@@ -16,6 +17,15 @@ import math
 import requests
 import os
 import json
+
+from telethon import TelegramClient
+from telethon.errors import (
+    RPCError, BrokenAuthKeyError, ServerError,
+    FloodWaitError, FloodTestPhoneWaitError, FileMigrateError,
+    TypeNotFoundError, UnauthorizedError, PhoneMigrateError,
+    NetworkMigrateError, UserMigrateError, SessionPasswordNeededError
+)
+from telethon.utils import get_display_name
 
 ABUSIVE_SPAM = json.loads(requests.get("https://bots.shrimadhavuk.me/Telegram/API/AbusiveSPAM.php").text)
 
@@ -65,12 +75,14 @@ def echo(bot, update):
             # bot.send_message(chat_id=-1001364708459, text=logger, parse_mode="HTML")
             if "noyes.in" not in url:
                 try:
-                    t_response = subprocess.check_output(["youtube-dl", "-j", url], stderr=subprocess.STDOUT)
+                    t_response = subprocess.check_output(["youtube-dl", "--no-warnings", "-j", url], stderr=subprocess.STDOUT)
+                    # https://github.com/rg3/youtube-dl/issues/2630#issuecomment-38635239
                 except subprocess.CalledProcessError as exc:
                     # print("Status : FAIL", exc.returncode, exc.output)
                     bot.send_message(chat_id=update.message.chat_id, text=exc.output.decode("UTF-8"))
                 else:
-                    x_reponse = t_response.decode("UTF-8")
+                    x_reponse = t_response.decode("UTF-8").replace("\'", "\"")
+                    # https://stackoverflow.com/a/40060181
                     response_json = json.loads(x_reponse)
                     inline_keyboard = []
                     for formats in response_json["formats"]:
@@ -113,13 +125,6 @@ def button(bot, update):
             chat_id=query.message.chat_id,
             message_id=query.message.message_id
         )
-        # if os.path.exists(download_directory):
-        #    bot.edit_message_text(
-        #        text="Free users can download only 1 URL per day",
-        #        chat_id=query.message.chat_id,
-        #        message_id=query.message.message_id
-        #    )
-        # else:
         download_directory = ""
         if "MP3" in youtube_dl_format:
             mp3, mp3_audio_quality = youtube_dl_format.split(":")
@@ -136,25 +141,39 @@ def button(bot, update):
         file_size = os.stat(download_directory).st_size
         if file_size > Config.MAX_FILE_SIZE:
             bot.edit_message_text(
-                text="size greater than maximum allowed size",
+                text="size greater than maximum allowed size. Neverthless, trying to upload.",
                 chat_id=query.message.chat_id,
                 message_id=query.message.message_id
             )
             # just send a link
             file_link = Config.HTTP_DOMAIN + "" + download_directory.replace("/media/FIFTYGB/two/sitein.org/videos/", "")
             bot.edit_message_text(
-                text="Please download the following [link](" + file_link + ") using any download manager or @UrlUploadBot. Link will expire after 24 hours.",
+                text="Please download the following [link](" + file_link + ") using any download manager or @UrlUploadBot. Link will expire after 24 hours. Still, trying to upload to telegram as file!",
                 chat_id=query.message.chat_id,
                 message_id=query.message.message_id,
                 parse_mode="Markdown"
             )
+            if file_size > Config.TG_MAX_FILE_SIZE:
+                bot.edit_message_text(
+                    text="Please download the following [link](" + file_link + ") using any download manager or @UrlUploadBot. Link will expire after 24 hours. ",
+                    chat_id=query.message.chat_id,
+                    message_id=query.message.message_id,
+                    parse_mode="Markdown"
+                )
+            else:
+                client.send_file(query.message.chat_id, file=download_directory, caption="@AnyDLBot", force_document=False, reply_to=query.message.message_id, allow_cache=False)
+                os.remove(download_directory)
+                bot.edit_message_text(
+                    text="uploaded successfully",
+                    chat_id=query.message.chat_id,
+                    message_id=query.message.message_id
+                )
         else:
             # try to upload file
             if download_directory.endswith("mp3"):
                 bot.send_audio(chat_id=query.message.chat_id, audio=open(download_directory, 'rb'), caption="@AnyDLBot")
             else:
                 bot.send_video(chat_id=query.message.chat_id, video=open(download_directory, 'rb'), caption="@AnyDLBot", supports_streaming=True)
-            # TODO: delete the file after successful upload
             os.remove(download_directory)
             bot.edit_message_text(
                 text="uploaded successfully",
@@ -170,12 +189,24 @@ def button(bot, update):
 
 
 if __name__ == "__main__" :
-    botan = Botan()
+    # botan = Botan()
     # create download directory, if not exist
     if not os.path.isdir(Config.DOWNLOAD_LOCATION):
         os.makedirs(Config.DOWNLOAD_LOCATION)
     # Create the Updater and pass it your bot's token.
     updater = Updater(token=Config.TG_BOT_TOKEN)
+    client = TelegramClient(
+        Config.TL_SESSION,
+        Config.APP_ID,
+        Config.API_HASH,
+        spawn_read_thread=False
+    )
+    client.connect()
+    if not client.is_user_authorized():
+        # https://github.com/LonamiWebs/Telethon/issues/36#issuecomment-287735063
+        client.sign_in(bot_token=Config.TG_BOT_TOKEN)
+    me = client.get_me()
+    # logger.info(me.stringify())
     dispatcher = updater.dispatcher
     start_handler = CommandHandler('start', start)
     dispatcher.add_handler(start_handler)
