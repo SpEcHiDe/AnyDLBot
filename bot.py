@@ -133,7 +133,7 @@ def button(bot, update):
             t_response = subprocess.check_output(["youtube-dl", "--extract-audio", "--audio-format", "mp3", "--audio-quality", mp3_audio_quality, youtube_dl_url, "-o", download_directory])
         else:
             download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:49] + "_" + youtube_dl_format + "." + "mp4" + ""
-            t_response = subprocess.check_output(["youtube-dl", "-f", youtube_dl_format, "--hls-prefer-ffmpeg", "--recode-video", "mp4", youtube_dl_url, "-o", download_directory])
+            t_response = subprocess.check_output(["youtube-dl", "-f", youtube_dl_format, "--hls-prefer-ffmpeg", "--recode-video", "mp4", "-k", youtube_dl_url, "-o", download_directory])
         bot.edit_message_text(
             text="trying to upload",
             chat_id=query.message.chat_id,
