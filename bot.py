@@ -9,8 +9,6 @@ logger = logging.getLogger(__name__)
 # the PTB
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-# the Telegram trackings
-from botan import Botan
 
 import subprocess
 import math
@@ -27,13 +25,24 @@ from telethon.errors import (
 )
 from telethon.utils import get_display_name
 
-ABUSIVE_SPAM = json.loads(requests.get("https://bots.shrimadhavuk.me/Telegram/API/AbusiveSPAM.php").text)
-
 # the secret configuration specific things
 from config import Config
 # the Strings used for this "thing"
 from translation import Translation
 
+# the Telegram trackings
+from chatbase import Message
+ABUSIVE_SPAM = json.loads(requests.get("https://bots.shrimadhavuk.me/Telegram/API/AbusiveSPAM.php").text)
+
+
+def TRChatBase(chat_id, message_text, intent):
+    msg = Message(api_key=Config.CHAT_BASE_TOKEN,
+              platform="Telegram",
+              version="1.3",
+              user_id=chat_id,
+              message=message_text,
+              intent=intent)
+    resp = msg.send()
 
 def humanbytes(size):
     # https://stackoverflow.com/a/49361727/4723940
@@ -52,20 +61,22 @@ def humanbytes(size):
 ## The telegram Specific Functions
 def error(bot, update, error):
     """Log Errors caused by Updates."""
+    TRChatBase(update.message.chat_id, update.message.text, "error")
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
 def start(bot, update):
-    # botan.track(Config.BOTAN_IO_TOKEN, update.message, update.message.chat_id)
+    TRChatBase(update.message.chat_id, update.message.text, "/start")
     bot.send_message(chat_id=update.message.chat_id, text=Translation.START_TEXT, reply_to_message_id=update.message.message_id)
 
 
 def upgrade(bot, update):
+    TRChatBase(update.message.chat_id, update.message.text, "/upgrade")
     bot.send_message(chat_id=update.message.chat_id, text=Translation.UPGRADE_TEXT, reply_to_message_id=update.message.message_id)
 
 
 def echo(bot, update):
-    # botan.track(Config.BOTAN_IO_TOKEN, update.message, update.message.chat_id)
+    TRChatBase(update.message.chat_id, update.message.text, "echo")
     if str(update.message.chat_id) in ABUSIVE_SPAM:
         bot.send_message(chat_id=update.message.chat_id, text=Translation.ABS_TEXT, reply_to_message_id=update.message.message_id)
     else:

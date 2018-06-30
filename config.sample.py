@@ -1,7 +1,7 @@
 
 class Config(object):
-    # get a token from http://botan.io
-    BOTAN_IO_TOKEN = ""
+    # get a token from https://chatbase.com
+    CHAT_BASE_TOKEN = ""
     # get a token from @BotFather
     TG_BOT_TOKEN = ""
     # your domain to show when download file is greater than MAX_FILE_SIZE
