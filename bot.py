@@ -86,7 +86,13 @@ def echo(bot, update):
             # bot.send_message(chat_id=-1001364708459, text=logger, parse_mode="HTML")
             if "noyes.in" not in url:
                 try:
-                    t_response = subprocess.check_output(["youtube-dl", "--no-warnings", "-j", url], stderr=subprocess.STDOUT)
+                    command_to_exec = ["youtube-dl", "--no-warnings", "-j", url]
+                    if "facebook" in url:
+                        command_to_exec.append("--username")
+                        command_to_exec.append(Config.FB_USER_NAME)
+                        command_to_exec.append("--password")
+                        command_to_exec.append(Config.FB_PASS_WORD)
+                    t_response = subprocess.check_output(command_to_exec, stderr=subprocess.STDOUT)
                     # https://github.com/rg3/youtube-dl/issues/2630#issuecomment-38635239
                 except subprocess.CalledProcessError as exc:
                     # print("Status : FAIL", exc.returncode, exc.output)
@@ -128,7 +134,13 @@ def button(bot, update):
     # if "hls" not in youtube_dl_format: #ggyyy.status:
     if "1" != "2":
         youtube_dl_url = query.message.reply_to_message.text
-        t_response = subprocess.check_output(["youtube-dl", "-j", youtube_dl_url])
+        command_to_exec = ["youtube-dl", "--no-warnings", "-j", youtube_dl_url]
+        if "facebook" in youtube_dl_url:
+            command_to_exec.append("--username")
+            command_to_exec.append(Config.FB_USER_NAME)
+            command_to_exec.append("--password")
+            command_to_exec.append(Config.FB_PASS_WORD)
+        t_response = subprocess.check_output(command_to_exec)
         x_reponse = t_response.decode("UTF-8")
         response_json = json.loads(x_reponse)
         file_name_ext = response_json["_filename"].split(".")[-1]
@@ -138,13 +150,20 @@ def button(bot, update):
             message_id=query.message.message_id
         )
         download_directory = ""
+        command_to_exec = []
         if "MP3" in youtube_dl_format:
             mp3, mp3_audio_quality = youtube_dl_format.split(":")
             download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:97] + "_" + youtube_dl_format + "." + "mp3" + ""
-            t_response = subprocess.check_output(["youtube-dl", "--extract-audio", "--audio-format", "mp3", "--audio-quality", mp3_audio_quality, youtube_dl_url, "-o", download_directory])
+            command_to_exec = ["youtube-dl", "--extract-audio", "--audio-format", "mp3", "--audio-quality", mp3_audio_quality, youtube_dl_url, "-o", download_directory]
         else:
             download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:49] + "_" + youtube_dl_format + "." + "mp4" + ""
-            t_response = subprocess.check_output(["youtube-dl", "-f", youtube_dl_format, "--hls-prefer-ffmpeg", "--recode-video", "mp4", "-k", youtube_dl_url, "-o", download_directory])
+            command_to_exec = ["youtube-dl", "-f", youtube_dl_format, "--hls-prefer-ffmpeg", "--recode-video", "mp4", "-k", youtube_dl_url, "-o", download_directory]
+        if "facebook" in youtube_dl_url:
+            command_to_exec.append("--username")
+            command_to_exec.append(Config.FB_USER_NAME)
+            command_to_exec.append("--password")
+            command_to_exec.append(Config.FB_PASS_WORD)
+        t_response = subprocess.check_output(command_to_exec)
         bot.edit_message_text(
             text="trying to upload",
             chat_id=query.message.chat_id,

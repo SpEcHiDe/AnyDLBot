@@ -17,4 +17,7 @@ class Config(object):
     # Get these values from my.telegram.org
     # for storing the Telethon session
     TL_SESSION = "AnyDLBot.session"
+    # FaceBook CRAP things
+    FB_USER_NAME = ""
+    FB_PASS_WORD = ""
 
