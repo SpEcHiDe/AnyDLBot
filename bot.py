@@ -61,7 +61,7 @@ def humanbytes(size):
 ## The telegram Specific Functions
 def error(bot, update, error):
     """Log Errors caused by Updates."""
-    TRChatBase(update.message.chat_id, update.message.text, "error")
+    # TRChatBase(update.message.chat_id, update.message.text, "error")
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
@@ -100,19 +100,20 @@ def echo(bot, update):
                     for formats in response_json["formats"]:
                         format_id = formats["format_id"]
                         format_string = formats["format"]
+                        format_ext = formats["ext"]
                         approx_file_size = ""
                         if "filesize" in formats:
                             approx_file_size = humanbytes(formats["filesize"])
                         ikeyboard = [
                             # InlineKeyboardButton(formats["format"], callback_data=formats["format_id"]),
-                            InlineKeyboardButton(format_string + "(" + approx_file_size + ")", callback_data=format_id)
+                            InlineKeyboardButton(format_string + "(" + format_ext + " - " + approx_file_size + ")", callback_data=format_id + ":" + format_ext)
                         ]
                         inline_keyboard.append(ikeyboard)
                     inline_keyboard.append([
-                        InlineKeyboardButton("MP3 " + "(" + "medium" + ")", callback_data="MP3:5")
+                        InlineKeyboardButton("MP3 " + "(" + "medium" + ")", callback_data="5:MP3")
                     ])
                     inline_keyboard.append([
-                        InlineKeyboardButton("MP3 " + "(" + "best" + ")", callback_data="MP3:0")
+                        InlineKeyboardButton("MP3 " + "(" + "best" + ")", callback_data="0:MP3")
                     ])
                     reply_markup = InlineKeyboardMarkup(inline_keyboard)
                     bot.send_message(chat_id=update.message.chat_id, text='Select the desired format: (file size might be approximate) ', reply_markup=reply_markup, reply_to_message_id=update.message.message_id)
@@ -124,7 +125,9 @@ def echo(bot, update):
 
 def button(bot, update):
     query = update.callback_query
-    youtube_dl_format = query.data
+    if query.data.find(":") == -1:
+        return ""
+    youtube_dl_format, youtube_dl_ext = query.data.split(":")
     # ggyyy = bot.getChatMember("@MalayalamTrollVoice", query.message.chat_id)
     # if "hls" not in youtube_dl_format: #ggyyy.status:
     if "1" != "2":
@@ -133,7 +136,7 @@ def button(bot, update):
         t_response = subprocess.check_output(command_to_exec)
         x_reponse = t_response.decode("UTF-8")
         response_json = json.loads(x_reponse)
-        file_name_ext = response_json["_filename"].split(".")[-1]
+        # file_name_ext = response_json["_filename"].split(".")[-1]
         bot.edit_message_text(
             text="trying to download",
             chat_id=query.message.chat_id,
@@ -142,13 +145,15 @@ def button(bot, update):
         download_directory = ""
         command_to_exec = []
         if "MP3" in youtube_dl_format:
-            mp3, mp3_audio_quality = youtube_dl_format.split(":")
-            download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:97] + "_" + youtube_dl_format + "." + "mp3" + ""
+            mp3_audio_quality, mp3 = youtube_dl_format.split(":")
+            download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:97] + "_" + youtube_dl_format + "." + youtube_dl_ext + ""
             command_to_exec = ["youtube-dl", "--extract-audio", "--audio-format", "mp3", "--audio-quality", mp3_audio_quality, youtube_dl_url, "-o", download_directory]
         else:
-            download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:49] + "_" + youtube_dl_format + "." + "mp4" + ""
-            command_to_exec = ["youtube-dl", "-f", youtube_dl_format, "--hls-prefer-ffmpeg", "--recode-video", "mp4", "-k", youtube_dl_url, "-o", download_directory]
+            download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:49] + "_" + youtube_dl_format + "." + youtube_dl_ext + ""
+            # command_to_exec = ["youtube-dl", "-f", youtube_dl_format, "--hls-prefer-ffmpeg", "--recode-video", "mp4", "-k", youtube_dl_url, "-o", download_directory]
+            command_to_exec = ["youtube-dl", "-f", youtube_dl_format, "--hls-prefer-ffmpeg", youtube_dl_url, "-o", download_directory]
         t_response = subprocess.check_output(command_to_exec)
+        logger.info(t_response)
         bot.edit_message_text(
             text="trying to upload",
             chat_id=query.message.chat_id,
@@ -157,42 +162,63 @@ def button(bot, update):
         file_size = os.stat(download_directory).st_size
         if file_size > Config.MAX_FILE_SIZE:
             bot.edit_message_text(
-                text="size greater than maximum allowed size. Neverthless, trying to upload.",
+                text="size greater than maximum allowed size (50MB). Neverthless, trying to upload.",
                 chat_id=query.message.chat_id,
                 message_id=query.message.message_id
             )
-            # just send a link
-            file_link = Config.HTTP_DOMAIN + "" + download_directory.replace("/media/FIFTYGB/two/sitein.org/videos/", "")
-            bot.edit_message_text(
-                text="Please download the following [link](" + file_link + ") using any download manager or @UrlUploadBot. Link will expire after 24 hours. Still, trying to upload to telegram as file!",
-                chat_id=query.message.chat_id,
-                message_id=query.message.message_id,
-                parse_mode="Markdown"
-            )
             if file_size > Config.TG_MAX_FILE_SIZE:
                 bot.edit_message_text(
-                    text="Please download the following [link](" + file_link + ") using any download manager or @UrlUploadBot. Link will expire after 24 hours. ",
+                    text="Sorry. But, I cannot upload files greater than 1.5GB due to telegram API limitations. ",
                     chat_id=query.message.chat_id,
                     message_id=query.message.message_id,
                     parse_mode="Markdown"
                 )
             else:
-                client.send_file(query.message.chat_id, file=download_directory, caption="@AnyDLBot", force_document=False, reply_to=query.message.message_id, allow_cache=False)
+                client.send_file(
+                    query.message.chat_id,
+                    file=download_directory,
+                    caption="@AnyDLBot",
+                    force_document=False,
+                    reply_to=query.message.reply_to_message.message_id,
+                    allow_cache=False
+                )
                 os.remove(download_directory)
-                bot.edit_message_text(
-                    text="uploaded successfully",
+                bot.delete_message(
                     chat_id=query.message.chat_id,
                     message_id=query.message.message_id
                 )
         else:
             # try to upload file
             if download_directory.endswith("mp3"):
-                bot.send_audio(chat_id=query.message.chat_id, audio=open(download_directory, 'rb'), caption="@AnyDLBot")
+                bot.send_audio(
+                    chat_id=query.message.chat_id,
+                    audio=open(download_directory, 'rb'),
+                    caption="@AnyDLBot",
+                    duration=response_json["duration"],
+                    performer=response_json["uploader"],
+                    title=response_json["title"],
+                    reply_to=query.message.reply_to_message.message_id
+                )
+            elif download_directory.endswith("mp4"):
+                bot.send_video(
+                    chat_id=query.message.chat_id,
+                    video=open(download_directory, 'rb'),
+                    caption="@AnyDLBot",
+                    duration=response_json["duration"],
+                    width=response_json["width"],
+                    height=response_json["height"],
+                    supports_streaming=True,
+                    reply_to=query.message.reply_to_message.message_id
+                )
             else:
-                bot.send_video(chat_id=query.message.chat_id, video=open(download_directory, 'rb'), caption="@AnyDLBot", supports_streaming=True)
+                bot.send_document(
+                    chat_id=query.message.chat_id,
+                    document=open(download_directory, 'rb'),
+                    caption="@AnyDLBot",
+                    reply_to=query.message.reply_to_message.message_id
+                )
             os.remove(download_directory)
-            bot.edit_message_text(
-                text="uploaded successfully",
+            bot.delete_message(
                 chat_id=query.message.chat_id,
                 message_id=query.message.message_id
             )
