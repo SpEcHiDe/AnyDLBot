@@ -7,7 +7,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(leve
 logger = logging.getLogger(__name__)
 
 # the PTB
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, DispatcherHandlerStop, run_async
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 import subprocess
@@ -65,16 +65,19 @@ def error(bot, update, error):
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
+@run_async
 def start(bot, update):
     TRChatBase(update.message.chat_id, update.message.text, "/start")
     bot.send_message(chat_id=update.message.chat_id, text=Translation.START_TEXT, reply_to_message_id=update.message.message_id)
 
 
+@run_async
 def upgrade(bot, update):
     TRChatBase(update.message.chat_id, update.message.text, "/upgrade")
     bot.send_message(chat_id=update.message.chat_id, text=Translation.UPGRADE_TEXT, reply_to_message_id=update.message.message_id)
 
 
+@run_async
 def echo(bot, update):
     TRChatBase(update.message.chat_id, update.message.text, "echo")
     if str(update.message.chat_id) in ABUSIVE_SPAM:
@@ -152,82 +155,96 @@ def button(bot, update):
             download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:49] + "_" + youtube_dl_format + "." + youtube_dl_ext + ""
             # command_to_exec = ["youtube-dl", "-f", youtube_dl_format, "--hls-prefer-ffmpeg", "--recode-video", "mp4", "-k", youtube_dl_url, "-o", download_directory]
             command_to_exec = ["youtube-dl", "-f", youtube_dl_format, "--hls-prefer-ffmpeg", youtube_dl_url, "-o", download_directory]
-        t_response = subprocess.check_output(command_to_exec)
-        logger.info(t_response)
-        bot.edit_message_text(
-            text="trying to upload",
-            chat_id=query.message.chat_id,
-            message_id=query.message.message_id
-        )
-        file_size = os.stat(download_directory).st_size
-        if file_size > Config.MAX_FILE_SIZE:
+        try:
+            t_response = subprocess.check_output(command_to_exec, stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as exc:
+            # print("Status : FAIL", exc.returncode, exc.output)
             bot.edit_message_text(
-                text="size greater than maximum allowed size (50MB). Neverthless, trying to upload.",
+                chat_id=query.message.chat_id,
+                message_id=query.message.message_id,
+                text=exc.output.decode("UTF-8")
+            )
+        else:
+            logger.info(t_response)
+            bot.edit_message_text(
+                text="trying to upload",
                 chat_id=query.message.chat_id,
                 message_id=query.message.message_id
             )
-            if file_size > Config.TG_MAX_FILE_SIZE:
+            file_size = os.stat(download_directory).st_size
+            if file_size > Config.MAX_FILE_SIZE:
                 bot.edit_message_text(
-                    text="Sorry. But, I cannot upload files greater than 1.5GB due to telegram API limitations. ",
+                    text="size greater than maximum allowed size (50MB). Neverthless, trying to upload.",
                     chat_id=query.message.chat_id,
-                    message_id=query.message.message_id,
-                    parse_mode="Markdown"
+                    message_id=query.message.message_id
                 )
+                if file_size > Config.TG_MAX_FILE_SIZE:
+                    bot.edit_message_text(
+                        text="Sorry. But, I cannot upload files greater than 1.5GB due to telegram API limitations. ",
+                        chat_id=query.message.chat_id,
+                        message_id=query.message.message_id,
+                        parse_mode="Markdown"
+                    )
+                else:
+                    return_response = DoUpload(query.message.chat_id, download_directory, "@AnyDLBot", query.message.reply_to_message.message_id)
+                    os.remove(download_directory)
+                    bot.delete_message(
+                        chat_id=query.message.chat_id,
+                        message_id=query.message.message_id
+                    )
             else:
-                client.send_file(
-                    query.message.chat_id,
-                    file=download_directory,
-                    caption="@AnyDLBot",
-                    force_document=False,
-                    reply_to=query.message.reply_to_message.message_id,
-                    allow_cache=False
-                )
+                # try to upload file
+                if download_directory.endswith("mp3"):
+                    bot.send_audio(
+                        chat_id=query.message.chat_id,
+                        audio=open(download_directory, 'rb'),
+                        caption="@AnyDLBot",
+                        duration=response_json["duration"],
+                        performer=response_json["uploader"],
+                        title=response_json["title"],
+                        reply_to=query.message.reply_to_message.message_id
+                    )
+                elif download_directory.endswith("mp4"):
+                    bot.send_video(
+                        chat_id=query.message.chat_id,
+                        video=open(download_directory, 'rb'),
+                        caption="@AnyDLBot",
+                        duration=response_json["duration"],
+                        width=response_json["width"],
+                        height=response_json["height"],
+                        supports_streaming=True,
+                        reply_to=query.message.reply_to_message.message_id
+                    )
+                else:
+                    bot.send_document(
+                        chat_id=query.message.chat_id,
+                        document=open(download_directory, 'rb'),
+                        caption="@AnyDLBot",
+                        reply_to=query.message.reply_to_message.message_id
+                    )
                 os.remove(download_directory)
                 bot.delete_message(
                     chat_id=query.message.chat_id,
                     message_id=query.message.message_id
                 )
-        else:
-            # try to upload file
-            if download_directory.endswith("mp3"):
-                bot.send_audio(
-                    chat_id=query.message.chat_id,
-                    audio=open(download_directory, 'rb'),
-                    caption="@AnyDLBot",
-                    duration=response_json["duration"],
-                    performer=response_json["uploader"],
-                    title=response_json["title"],
-                    reply_to=query.message.reply_to_message.message_id
-                )
-            elif download_directory.endswith("mp4"):
-                bot.send_video(
-                    chat_id=query.message.chat_id,
-                    video=open(download_directory, 'rb'),
-                    caption="@AnyDLBot",
-                    duration=response_json["duration"],
-                    width=response_json["width"],
-                    height=response_json["height"],
-                    supports_streaming=True,
-                    reply_to=query.message.reply_to_message.message_id
-                )
-            else:
-                bot.send_document(
-                    chat_id=query.message.chat_id,
-                    document=open(download_directory, 'rb'),
-                    caption="@AnyDLBot",
-                    reply_to=query.message.reply_to_message.message_id
-                )
-            os.remove(download_directory)
-            bot.delete_message(
-                chat_id=query.message.chat_id,
-                message_id=query.message.message_id
-            )
     else:
         bot.edit_message_text(
             text=Translation.ABS_TEXT,
             chat_id=query.message.chat_id,
             message_id=query.message.message_id
         )
+
+
+def DoUpload(chat_id, video_file, caption, message_id):
+    client.send_file(
+        chat_id,
+        file=video_file,
+        caption=caption,
+        force_document=False,
+        reply_to=message_id,
+        allow_cache=False
+    )
+
 
 
 if __name__ == "__main__" :
@@ -240,8 +257,7 @@ if __name__ == "__main__" :
     client = TelegramClient(
         Config.TL_SESSION,
         Config.APP_ID,
-        Config.API_HASH,
-        spawn_read_thread=False
+        Config.API_HASH
     )
     client.connect()
     if not client.is_user_authorized():
