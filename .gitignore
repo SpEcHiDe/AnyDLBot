@@ -213,4 +213,4 @@ config.py
 # to store the downloaded files
 /DOWNLOADS
 *.session
-
+*.session*

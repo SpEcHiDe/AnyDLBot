@@ -32,8 +32,7 @@ from translation import Translation
 
 # the Telegram trackings
 from chatbase import Message
-ABUSIVE_SPAM = json.loads(requests.get("https://bots.shrimadhavuk.me/Telegram/API/AbusiveSPAM.php").text)
-
+ABUSIVE_SPAM = []
 
 def TRChatBase(chat_id, message_text, intent):
     msg = Message(api_key=Config.CHAT_BASE_TOKEN,
@@ -109,14 +108,14 @@ def echo(bot, update):
                             approx_file_size = humanbytes(formats["filesize"])
                         ikeyboard = [
                             # InlineKeyboardButton(formats["format"], callback_data=formats["format_id"]),
-                            InlineKeyboardButton(format_string + "(" + format_ext + " - " + approx_file_size + ")", callback_data=format_id + ":" + format_ext)
+                            InlineKeyboardButton("[" + format_string + "] (" + format_ext + " - " + approx_file_size + ")", callback_data=format_id + ":" + format_ext)
                         ]
                         inline_keyboard.append(ikeyboard)
                     inline_keyboard.append([
-                        InlineKeyboardButton("MP3 " + "(" + "medium" + ")", callback_data="5:MP3")
+                        InlineKeyboardButton("MP3 " + "(" + "medium" + ")", callback_data="5:mp3")
                     ])
                     inline_keyboard.append([
-                        InlineKeyboardButton("MP3 " + "(" + "best" + ")", callback_data="0:MP3")
+                        InlineKeyboardButton("MP3 " + "(" + "best" + ")", callback_data="0:mp3")
                     ])
                     reply_markup = InlineKeyboardMarkup(inline_keyboard)
                     bot.send_message(chat_id=update.message.chat_id, text='Select the desired format: (file size might be approximate) ', reply_markup=reply_markup, reply_to_message_id=update.message.message_id)
@@ -147,14 +146,27 @@ def button(bot, update):
         )
         download_directory = ""
         command_to_exec = []
-        if "MP3" in youtube_dl_format:
-            mp3_audio_quality, mp3 = youtube_dl_format.split(":")
+        if "mp3" in youtube_dl_ext:
             download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:97] + "_" + youtube_dl_format + "." + youtube_dl_ext + ""
-            command_to_exec = ["youtube-dl", "--extract-audio", "--audio-format", "mp3", "--audio-quality", mp3_audio_quality, youtube_dl_url, "-o", download_directory]
+            command_to_exec = [
+                "youtube-dl",
+                "--extract-audio",
+                "--audio-format", youtube_dl_ext,
+                "--audio-quality", youtube_dl_format,
+                youtube_dl_url,
+                "-o", download_directory
+            ]
         else:
             download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:49] + "_" + youtube_dl_format + "." + youtube_dl_ext + ""
             # command_to_exec = ["youtube-dl", "-f", youtube_dl_format, "--hls-prefer-ffmpeg", "--recode-video", "mp4", "-k", youtube_dl_url, "-o", download_directory]
-            command_to_exec = ["youtube-dl", "-f", youtube_dl_format, "--hls-prefer-ffmpeg", youtube_dl_url, "-o", download_directory]
+            command_to_exec = [
+                "youtube-dl",
+                "--embed-subs",
+                "-f", youtube_dl_format,
+                "--hls-prefer-ffmpeg", youtube_dl_url,
+                "-o", download_directory
+            ]
+        print(command_to_exec)
         try:
             t_response = subprocess.check_output(command_to_exec, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as exc:
