@@ -136,6 +136,7 @@ def echo(bot, update):
                         chat_id=update.message.chat_id,
                         text='Select the desired format: [file size might be approximate](' + response_json["thumbnail"] + ') ',
                         reply_markup=reply_markup,
+                        parse_mode="Markdown",
                         reply_to_message_id=update.message.message_id
                     )
             else:
@@ -165,7 +166,9 @@ def button(bot, update):
         t_response = subprocess.check_output(command_to_exec)
         x_reponse = t_response.decode("UTF-8")
         response_json = json.loads(x_reponse)
-        format_url = requests.get("https://da.gd/s?url=" + str(response_json["url"])).text
+        format_url = "https://www.shrimadhavuk.me"
+        if "url" in response_json:
+            format_url = requests.get("https://da.gd/s?url=" + str(response_json["url"])).text
         inline_keyboard = []
         inline_keyboard.append([
             InlineKeyboardButton(" Direct DownLoad Link ", url=format_url)
@@ -179,11 +182,12 @@ def button(bot, update):
         )
         description = " " + " \r\n© @AnyDLBot"
         if "description" in response_json:
-            description = " " + str(response_json["description"])[0:2500] + " \r\n© @AnyDLBot"
+            description = " " + str(response_json["description"])[0:150] + " \r\n© @AnyDLBot"
         download_directory = ""
         command_to_exec = []
+        output_file_name, output_real_file_ext = response_json["_filename"].split(".")
         if "mp3" in youtube_dl_ext:
-            download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:97] + "_" + youtube_dl_format + "." + youtube_dl_ext + ""
+            download_directory = Config.DOWNLOAD_LOCATION + "/" + str(output_file_name)[0:97] + "_" + youtube_dl_format + "." + youtube_dl_ext + ""
             command_to_exec = [
                 "youtube-dl",
                 "--extract-audio",
@@ -193,7 +197,7 @@ def button(bot, update):
                 "-o", download_directory
             ]
         else:
-            download_directory = Config.DOWNLOAD_LOCATION + "/" + str(response_json["_filename"])[0:49] + "_" + youtube_dl_format + "." + youtube_dl_ext + ""
+            download_directory = Config.DOWNLOAD_LOCATION + "/" + str(output_file_name)[0:97] + "_" + youtube_dl_format + "." + youtube_dl_ext + ""
             # command_to_exec = ["youtube-dl", "-f", youtube_dl_format, "--hls-prefer-ffmpeg", "--recode-video", "mp4", "-k", youtube_dl_url, "-o", download_directory]
             command_to_exec = [
                 "youtube-dl",
