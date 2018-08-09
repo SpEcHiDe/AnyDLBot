@@ -24,9 +24,10 @@ from telethon.errors import (
     NetworkMigrateError, UserMigrateError, SessionPasswordNeededError
 )
 from telethon.utils import get_display_name
-import hachoir
-import hachoir.metadata
-import hachoir.parser
+from hachoir.metadata import extractMetadata
+from hachoir.parser import createParser
+from telethon.tl.types import DocumentAttributeVideo
+
 
 # the secret configuration specific things
 from config import Config
@@ -293,6 +294,7 @@ def button(bot, update):
 
 
 def DoUpload(chat_id, video_file, caption, message_id):
+    metadata = extractMetadata(createParser(video_file))
     client.send_file(
         chat_id,
         file=video_file,
@@ -300,7 +302,15 @@ def DoUpload(chat_id, video_file, caption, message_id):
         force_document=False,
         reply_to=message_id,
         allow_cache=False,
-        supports_streaming=True
+        attributes=[
+            DocumentAttributeVideo(
+                duration=metadata.get("duration").seconds,
+                w=metadata.get("width"),
+                h=metadata.get("height"),
+                round_message=False,
+                supports_streaming=True
+            )
+        ]
     )
 
 

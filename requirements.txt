@@ -12,3 +12,5 @@ Telethon-sync==1.0.4
 urllib3==1.22
 yarl==1.2.6
 youtube-dl==2018.6.25
+hachoir
+
