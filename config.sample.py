@@ -17,3 +17,5 @@ class Config(object):
     # Get these values from my.telegram.org
     # for storing the Telethon session
     TL_SESSION = "AnyDLBot.session"
+    CHUNK_SIZE = 128
+

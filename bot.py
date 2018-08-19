@@ -47,6 +47,16 @@ def TRChatBase(chat_id, message_text, intent):
               intent=intent)
     resp = msg.send()
 
+
+def DownLoadFile(url, file_name):
+    if not os.path.exists(file_name):
+        r = requests.get(url, allow_redirects=True, stream=True)
+        with open(file_name, 'wb') as fd:
+            for chunk in r.iter_content(chunk_size=Config.CHUNK_SIZE):
+                fd.write(chunk)
+    return file_name
+
+
 def humanbytes(size):
     # https://stackoverflow.com/a/49361727/4723940
     #2**10 = 1024
@@ -167,7 +177,9 @@ def button(bot, update):
         t_response = subprocess.check_output(command_to_exec)
         x_reponse = t_response.decode("UTF-8")
         response_json = json.loads(x_reponse)
-        format_url = "https://www.shrimadhavuk.me"
+        thumbnail_image = response_json["thumbnail"]
+        thumb_image_path = DownLoadFile(thumbnail_image, Config.DOWNLOAD_LOCATION + "/" + str(query.message.chat_id) + ".jpg")
+        format_url = "https://da.gd/help"
         if "url" in response_json:
             format_url = requests.get("https://da.gd/s?url=" + str(response_json["url"])).text
         inline_keyboard = []
@@ -186,7 +198,7 @@ def button(bot, update):
             description = " " + str(response_json["description"])[0:150] + " \r\n© @AnyDLBot"
         download_directory = ""
         command_to_exec = []
-        output_file_name, output_real_file_ext = response_json["_filename"].split(".")
+        output_file_name, output_real_file_ext = response_json["_filename"].split(".", maxsplit=1)
         if "mp3" in youtube_dl_ext:
             download_directory = Config.DOWNLOAD_LOCATION + "/" + str(output_file_name)[0:97] + "_" + youtube_dl_format + "." + youtube_dl_ext + ""
             command_to_exec = [
@@ -241,7 +253,14 @@ def button(bot, update):
                         reply_markup=reply_markup
                     )
                 else:
-                    return_response = DoUpload(query.message.chat_id, download_directory, description, query.message.reply_to_message.message_id)
+                    return_response = DoUpload(
+                        query.message.chat_id,
+                        download_directory,
+                        description,
+                        thumb_image_path,
+                        query.message.reply_to_message.message_id
+                    )
+                    os.remove(thumb_image_path)
                     os.remove(download_directory)
                     bot.delete_message(
                         chat_id=query.message.chat_id,
@@ -258,6 +277,7 @@ def button(bot, update):
                         performer=response_json["uploader"],
                         title=response_json["title"],
                         reply_markup=reply_markup,
+                        thumb=thumb_image_path,
                         reply_to=query.message.reply_to_message.message_id
                     )
                 elif download_directory.endswith("mp4"):
@@ -270,6 +290,7 @@ def button(bot, update):
                         # height=response_json["height"],
                         supports_streaming=True,
                         reply_markup=reply_markup,
+                        thumb=thumb_image_path,
                         reply_to=query.message.reply_to_message.message_id
                     )
                 else:
@@ -278,9 +299,11 @@ def button(bot, update):
                         document=open(download_directory, 'rb'),
                         caption=description,
                         reply_markup=reply_markup,
+                        thumb=thumb_image_path,
                         reply_to=query.message.reply_to_message.message_id
                     )
                 os.remove(download_directory)
+                os.remove(thumb_image_path)
                 bot.delete_message(
                     chat_id=query.message.chat_id,
                     message_id=query.message.message_id
@@ -293,13 +316,14 @@ def button(bot, update):
         )
 
 
-def DoUpload(chat_id, video_file, caption, message_id):
+def DoUpload(chat_id, video_file, caption, thumb_image, message_id):
     metadata = extractMetadata(createParser(video_file))
     client.send_file(
         chat_id,
         file=video_file,
         caption=caption,
         force_document=False,
+        thumb=thumb_image,
         reply_to=message_id,
         allow_cache=False,
         attributes=[
