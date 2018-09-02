@@ -123,7 +123,7 @@ def echo(bot, update):
                     inline_keyboard = []
                     for formats in response_json["formats"]:
                         format_id = formats["format_id"]
-                        ignore, format_string = formats["format"].split("-")
+                        format_string = formats["format"]
                         format_ext = formats["ext"]
                         approx_file_size = ""
                         if "filesize" in formats:
@@ -143,9 +143,12 @@ def echo(bot, update):
                     ])
                     reply_markup = InlineKeyboardMarkup(inline_keyboard)
                     logger.info(reply_markup)
+                    thumbnail = "https://placehold.it/50x50"
+                    if "thumbnail" in response_json:
+                        thumbnail = response_json["thumbnail"]
                     bot.send_message(
                         chat_id=update.message.chat_id,
-                        text='Select the desired format: [file size might be approximate](' + response_json["thumbnail"] + ') ',
+                        text='Select the desired format: [file size might be approximate](' + thumbnail + ') ',
                         reply_markup=reply_markup,
                         parse_mode="Markdown",
                         reply_to_message_id=update.message.message_id
@@ -177,7 +180,9 @@ def button(bot, update):
         t_response = subprocess.check_output(command_to_exec)
         x_reponse = t_response.decode("UTF-8")
         response_json = json.loads(x_reponse)
-        thumbnail_image = response_json["thumbnail"]
+        thumbnail_image = "https://placehold.it/50x50"
+        if "thumbnail" in response_json:
+            response_json["thumbnail"]
         thumb_image_path = DownLoadFile(thumbnail_image, Config.DOWNLOAD_LOCATION + "/" + str(query.message.chat_id) + ".jpg")
         format_url = "https://da.gd/help"
         if "url" in response_json:
