@@ -323,6 +323,12 @@ def button(bot, update):
 
 def DoUpload(chat_id, video_file, caption, thumb_image, message_id):
     metadata = extractMetadata(createParser(video_file))
+    width = 0
+    if metadata.has("width"):
+        width = metadata.get("width")
+    height = 0
+    if metadata.has("height"):
+        height = metadata.get("height")
     client.send_file(
         chat_id,
         file=video_file,
@@ -334,8 +340,8 @@ def DoUpload(chat_id, video_file, caption, thumb_image, message_id):
         attributes=[
             DocumentAttributeVideo(
                 duration=metadata.get("duration").seconds,
-                w=metadata.get("width"),
-                h=metadata.get("height"),
+                w=width,
+                h=height,
                 round_message=False,
                 supports_streaming=True
             )
