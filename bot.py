@@ -172,9 +172,9 @@ def button(bot, update):
     if query.data.find(":") == -1:
         return ""
     youtube_dl_format, youtube_dl_ext = query.data.split(":")
-    # ggyyy = bot.getChatMember("@MalayalamTrollVoice", query.message.chat_id)
-    # if ggyyy.status != "left":
-    if "1" != "2":
+    ggyyy = bot.getChatMember("@MalayalamTrollVoice", query.message.chat_id)
+    if ggyyy.status != "left":
+    # if "1" != "2":
         youtube_dl_url = query.message.reply_to_message.text
         command_to_exec = ["youtube-dl", "--no-warnings", "-j", youtube_dl_url]
         t_response = subprocess.check_output(command_to_exec)
