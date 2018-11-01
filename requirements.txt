@@ -1,9 +1,7 @@
-hachoir3==3.0a2
-python-telegram-bot==10.1.0
-requests==2.18.4
-Telethon-sync==1.0.4
-urllib3==1.22
+hachoir3
+python-telegram-bot
+requests
+Telethon
 youtube-dl
-hachoir
 git+git://github.com/google/chatbase-python.git
 

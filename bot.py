@@ -16,7 +16,7 @@ import requests
 import os
 import json
 
-from telethon import TelegramClient
+from telethon import TelegramClient, sync
 from telethon.errors import (
     RPCError, BrokenAuthKeyError, ServerError,
     FloodWaitError, FloodTestPhoneWaitError, FileMigrateError,
@@ -30,7 +30,10 @@ from telethon.tl.types import DocumentAttributeVideo
 
 
 # the secret configuration specific things
-from config import Config
+if bool(os.environ.get("WEBHOOK", False)):
+    from sample_config import Config
+else:
+    from config import Config
 # the Strings used for this "thing"
 from translation import Translation
 
@@ -91,80 +94,76 @@ def start(bot, update):
 @run_async
 def echo(bot, update):
     TRChatBase(update.message.chat_id, update.message.text, "echo")
-    if str(update.message.chat_id) in ABUSIVE_SPAM:
-        bot.send_message(
-            chat_id=update.message.chat_id,
-            text=Translation.ABS_TEXT,
-            reply_to_message_id=update.message.message_id
-        )
-    else:
-        bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.TYPING)
-        text = update.message.text
-        if(text.startswith("http")):
-            url = text
-            # logger = "<a href='" + url + "'>url</a> by <a href='tg://user?id=" + str(update.message.chat_id) + "'>" + str(update.message.chat_id) + "</a>"
-            # bot.send_message(chat_id=-1001364708459, text=logger, parse_mode="HTML")
-            if "noyes.in" not in url:
-                try:
-                    command_to_exec = ["youtube-dl", "--no-warnings", "-j", url]
-                    t_response = subprocess.check_output(command_to_exec, stderr=subprocess.STDOUT)
-                    # https://github.com/rg3/youtube-dl/issues/2630#issuecomment-38635239
-                except subprocess.CalledProcessError as exc:
-                    # print("Status : FAIL", exc.returncode, exc.output)
-                    bot.send_message(
-                        chat_id=update.message.chat_id,
-                        text=exc.output.decode("UTF-8"),
-                        reply_to_message_id=update.message.message_id
-                    )
-                else:
-                    x_reponse = t_response.decode("UTF-8")
-                    # print(x_reponse)
-                    response_json = json.loads(x_reponse)
-                    inline_keyboard = []
-                    for formats in response_json["formats"]:
-                        format_id = formats["format_id"]
-                        format_string = formats["format"]
-                        format_ext = formats["ext"]
-                        approx_file_size = ""
-                        if "filesize" in formats:
-                            approx_file_size = humanbytes(formats["filesize"])
-                        ikeyboard = [
-                            InlineKeyboardButton(
-                                "[" + format_string + "] (" + format_ext + " - " + approx_file_size + ")",
-                                callback_data=format_id + ":" + format_ext
-                            )
-                        ]
-                        inline_keyboard.append(ikeyboard)
-                    inline_keyboard.append([
-                        InlineKeyboardButton("MP3 " + "(" + "medium" + ")", callback_data="5:mp3")
-                    ])
-                    inline_keyboard.append([
-                        InlineKeyboardButton("MP3 " + "(" + "best" + ")", callback_data="0:mp3")
-                    ])
-                    reply_markup = InlineKeyboardMarkup(inline_keyboard)
-                    logger.info(reply_markup)
-                    thumbnail = "https://placehold.it/50x50"
-                    if "thumbnail" in response_json:
-                        thumbnail = response_json["thumbnail"]
-                    bot.send_message(
-                        chat_id=update.message.chat_id,
-                        text='Select the desired format: [file size might be approximate](' + thumbnail + ') ',
-                        reply_markup=reply_markup,
-                        parse_mode="Markdown",
-                        reply_to_message_id=update.message.message_id
-                    )
-            else:
+    bot.send_chat_action(
+        chat_id=update.message.chat_id,
+        action=ChatAction.TYPING
+    )
+    text = update.message.text
+    if(text.startswith("http")):
+        url = text
+        # logger = "<a href='" + url + "'>url</a> by <a href='tg://user?id=" + str(update.message.chat_id) + "'>" + str(update.message.chat_id) + "</a>"
+        # bot.send_message(chat_id=-1001364708459, text=logger, parse_mode="HTML")
+        if "noyes.in" not in url:
+            try:
+                command_to_exec = ["youtube-dl", "--no-warnings", "-j", url]
+                t_response = subprocess.check_output(command_to_exec, stderr=subprocess.STDOUT)
+                # https://github.com/rg3/youtube-dl/issues/2630#issuecomment-38635239
+            except subprocess.CalledProcessError as exc:
+                # print("Status : FAIL", exc.returncode, exc.output)
                 bot.send_message(
                     chat_id=update.message.chat_id,
-                    text="@GetPublicLinkBot URL detected. Please do not abuse the service!",
+                    text=exc.output.decode("UTF-8"),
+                    reply_to_message_id=update.message.message_id
+                )
+            else:
+                x_reponse = t_response.decode("UTF-8")
+                # print(x_reponse)
+                response_json = json.loads(x_reponse)
+                inline_keyboard = []
+                for formats in response_json["formats"]:
+                    format_id = formats["format_id"]
+                    format_string = formats["format"]
+                    format_ext = formats["ext"]
+                    approx_file_size = ""
+                    if "filesize" in formats:
+                        approx_file_size = humanbytes(formats["filesize"])
+                    ikeyboard = [
+                        InlineKeyboardButton(
+                            "[" + format_string + "] (" + format_ext + " - " + approx_file_size + ")",
+                            callback_data=format_id + ":" + format_ext
+                        )
+                    ]
+                    inline_keyboard.append(ikeyboard)
+                inline_keyboard.append([
+                    InlineKeyboardButton("MP3 " + "(" + "medium" + ")", callback_data="5:mp3")
+                ])
+                inline_keyboard.append([
+                    InlineKeyboardButton("MP3 " + "(" + "best" + ")", callback_data="0:mp3")
+                ])
+                reply_markup = InlineKeyboardMarkup(inline_keyboard)
+                logger.info(reply_markup)
+                thumbnail = "https://placehold.it/50x50"
+                if "thumbnail" in response_json:
+                    thumbnail = response_json["thumbnail"]
+                bot.send_message(
+                    chat_id=update.message.chat_id,
+                    text=Translation.FORMAT_SELECTION.format(thumbnail),
+                    reply_markup=reply_markup,
+                    parse_mode="Markdown",
                     reply_to_message_id=update.message.message_id
                 )
         else:
             bot.send_message(
                 chat_id=update.message.chat_id,
-                text=Translation.START_TEXT,
+                text=Translation.NOYES_URL,
                 reply_to_message_id=update.message.message_id
             )
+    else:
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text=Translation.START_TEXT,
+            reply_to_message_id=update.message.message_id
+        )
 
 
 def button(bot, update):
@@ -172,153 +171,143 @@ def button(bot, update):
     if query.data.find(":") == -1:
         return ""
     youtube_dl_format, youtube_dl_ext = query.data.split(":")
-    ggyyy = bot.getChatMember("@MalayalamTrollVoice", query.message.chat_id)
-    if ggyyy.status != "left":
-    # if "1" != "2":
-        youtube_dl_url = query.message.reply_to_message.text
-        command_to_exec = ["youtube-dl", "--no-warnings", "-j", youtube_dl_url]
-        t_response = subprocess.check_output(command_to_exec)
-        x_reponse = t_response.decode("UTF-8")
-        response_json = json.loads(x_reponse)
-        thumbnail_image = "https://placehold.it/50x50"
-        if "thumbnail" in response_json:
-            response_json["thumbnail"]
-        thumb_image_path = DownLoadFile(thumbnail_image, Config.DOWNLOAD_LOCATION + "/" + str(query.message.chat_id) + ".jpg")
-        format_url = "https://da.gd/help"
-        if "url" in response_json:
-            format_url = requests.get("https://da.gd/s?url=" + str(response_json["url"])).text
-        inline_keyboard = []
-        inline_keyboard.append([
-            InlineKeyboardButton(" Direct DownLoad Link ", url=format_url)
-        ])
-        reply_markup = InlineKeyboardMarkup(inline_keyboard)
-        # file_name_ext = response_json["_filename"].split(".")[-1]
+    youtube_dl_url = query.message.reply_to_message.text
+    command_to_exec = ["youtube-dl", "--no-warnings", "-j", youtube_dl_url]
+    t_response = subprocess.check_output(command_to_exec)
+    x_reponse = t_response.decode("UTF-8")
+    response_json = json.loads(x_reponse)
+    thumbnail_image = "https://placehold.it/50x50"
+    if "thumbnail" in response_json:
+        response_json["thumbnail"]
+    thumb_image_path = DownLoadFile(thumbnail_image, Config.DOWNLOAD_LOCATION + "/" + str(query.message.chat_id) + ".jpg")
+    format_url = "https://da.gd/help"
+    if "url" in response_json:
+        format_url = requests.get("https://da.gd/s?url=" + str(response_json["url"])).text
+    inline_keyboard = []
+    inline_keyboard.append([
+        InlineKeyboardButton(" Direct DownLoad Link ", url=format_url)
+    ])
+    reply_markup = InlineKeyboardMarkup(inline_keyboard)
+    # file_name_ext = response_json["_filename"].split(".")[-1]
+    bot.edit_message_text(
+        text=Translation.DOWNLOAD_START,
+        chat_id=query.message.chat_id,
+        message_id=query.message.message_id
+    )
+    description = " " + " \r\n© @AnyDLBot"
+    if "description" in response_json:
+        description = " " + str(response_json["description"])[0:150] + " \r\n© @AnyDLBot"
+    download_directory = ""
+    command_to_exec = []
+    output_file_name, output_real_file_ext = response_json["_filename"].split(".", maxsplit=1)
+    if "mp3" in youtube_dl_ext:
+        download_directory = Config.DOWNLOAD_LOCATION + "/" + str(output_file_name)[0:97] + "_" + youtube_dl_format + "." + youtube_dl_ext + ""
+        command_to_exec = [
+            "youtube-dl",
+            "--extract-audio",
+            "--audio-format", youtube_dl_ext,
+            "--audio-quality", youtube_dl_format,
+            youtube_dl_url,
+            "-o", download_directory
+        ]
+    else:
+        download_directory = Config.DOWNLOAD_LOCATION + "/" + str(output_file_name)[0:97] + "_" + youtube_dl_format + "." + youtube_dl_ext + ""
+        # command_to_exec = ["youtube-dl", "-f", youtube_dl_format, "--hls-prefer-ffmpeg", "--recode-video", "mp4", "-k", youtube_dl_url, "-o", download_directory]
+        command_to_exec = [
+            "youtube-dl",
+            "--embed-subs",
+            "-f", youtube_dl_format,
+            "--hls-prefer-ffmpeg", youtube_dl_url,
+            "-o", download_directory
+        ]
+    logger.info(command_to_exec)
+    try:
+        t_response = subprocess.check_output(command_to_exec, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as exc:
+        # print("Status : FAIL", exc.returncode, exc.output)
         bot.edit_message_text(
-            text="trying to download",
+            chat_id=query.message.chat_id,
+            message_id=query.message.message_id,
+            text=exc.output.decode("UTF-8"),
+            reply_markup=reply_markup
+        )
+    else:
+        logger.info(t_response)
+        bot.edit_message_text(
+            text=Translation.UPLOAD_START,
             chat_id=query.message.chat_id,
             message_id=query.message.message_id
         )
-        description = " " + " \r\n© @AnyDLBot"
-        if "description" in response_json:
-            description = " " + str(response_json["description"])[0:150] + " \r\n© @AnyDLBot"
-        download_directory = ""
-        command_to_exec = []
-        output_file_name, output_real_file_ext = response_json["_filename"].split(".", maxsplit=1)
-        if "mp3" in youtube_dl_ext:
-            download_directory = Config.DOWNLOAD_LOCATION + "/" + str(output_file_name)[0:97] + "_" + youtube_dl_format + "." + youtube_dl_ext + ""
-            command_to_exec = [
-                "youtube-dl",
-                "--extract-audio",
-                "--audio-format", youtube_dl_ext,
-                "--audio-quality", youtube_dl_format,
-                youtube_dl_url,
-                "-o", download_directory
-            ]
-        else:
-            download_directory = Config.DOWNLOAD_LOCATION + "/" + str(output_file_name)[0:97] + "_" + youtube_dl_format + "." + youtube_dl_ext + ""
-            # command_to_exec = ["youtube-dl", "-f", youtube_dl_format, "--hls-prefer-ffmpeg", "--recode-video", "mp4", "-k", youtube_dl_url, "-o", download_directory]
-            command_to_exec = [
-                "youtube-dl",
-                "--embed-subs",
-                "-f", youtube_dl_format,
-                "--hls-prefer-ffmpeg", youtube_dl_url,
-                "-o", download_directory
-            ]
-        print(command_to_exec)
-        try:
-            t_response = subprocess.check_output(command_to_exec, stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError as exc:
-            # print("Status : FAIL", exc.returncode, exc.output)
+        file_size = os.stat(download_directory).st_size
+        if file_size > Config.MAX_FILE_SIZE:
             bot.edit_message_text(
-                chat_id=query.message.chat_id,
-                message_id=query.message.message_id,
-                text=exc.output.decode("UTF-8"),
-                reply_markup=reply_markup
-            )
-        else:
-            logger.info(t_response)
-            bot.edit_message_text(
-                text="trying to upload",
+                text=Translation.RCHD_BOT_API_LIMIT,
                 chat_id=query.message.chat_id,
                 message_id=query.message.message_id
             )
-            file_size = os.stat(download_directory).st_size
-            if file_size > Config.MAX_FILE_SIZE:
+            if file_size > Config.TG_MAX_FILE_SIZE:
                 bot.edit_message_text(
-                    text="size greater than maximum allowed size (50MB). Neverthless, trying to upload.",
+                    text=Translation.RCHD_TG_API_LIMIT,
                     chat_id=query.message.chat_id,
-                    message_id=query.message.message_id
+                    message_id=query.message.message_id,
+                    reply_markup=reply_markup
                 )
-                if file_size > Config.TG_MAX_FILE_SIZE:
-                    bot.edit_message_text(
-                        text="Sorry. But, I cannot upload files greater than 1.5GB due to telegram API limitations. ",
-                        chat_id=query.message.chat_id,
-                        message_id=query.message.message_id,
-                        parse_mode="Markdown",
-                        reply_markup=reply_markup
-                    )
-                else:
-                    return_response = DoUpload(
-                        query.message.chat_id,
-                        download_directory,
-                        description,
-                        thumb_image_path,
-                        query.message.reply_to_message.message_id
-                    )
-                    os.remove(thumb_image_path)
-                    os.remove(download_directory)
-                    bot.delete_message(
-                        chat_id=query.message.chat_id,
-                        message_id=query.message.message_id
-                    )
             else:
-                # try to upload file
-                if download_directory.endswith("mp3"):
-                    bot.send_audio(
-                        chat_id=query.message.chat_id,
-                        audio=open(download_directory, 'rb'),
-                        caption=description,
-                        duration=response_json["duration"],
-                        performer=response_json["uploader"],
-                        title=response_json["title"],
-                        reply_markup=reply_markup,
-                        thumb=thumb_image_path,
-                        reply_to=query.message.reply_to_message.message_id
-                    )
-                elif download_directory.endswith("mp4"):
-                    bot.send_video(
-                        chat_id=query.message.chat_id,
-                        video=open(download_directory, 'rb'),
-                        caption=description,
-                        # duration=response_json["duration"],
-                        # width=response_json["width"],
-                        # height=response_json["height"],
-                        supports_streaming=True,
-                        reply_markup=reply_markup,
-                        thumb=thumb_image_path,
-                        reply_to=query.message.reply_to_message.message_id
-                    )
-                else:
-                    bot.send_document(
-                        chat_id=query.message.chat_id,
-                        document=open(download_directory, 'rb'),
-                        caption=description,
-                        reply_markup=reply_markup,
-                        thumb=thumb_image_path,
-                        reply_to=query.message.reply_to_message.message_id
-                    )
-                os.remove(download_directory)
+                return_response = DoUpload(
+                    query.message.chat_id,
+                    download_directory,
+                    description,
+                    thumb_image_path,
+                    query.message.reply_to_message.message_id
+                )
                 os.remove(thumb_image_path)
+                os.remove(download_directory)
                 bot.delete_message(
                     chat_id=query.message.chat_id,
                     message_id=query.message.message_id
                 )
-    else:
-        bot.edit_message_text(
-            text=Translation.ABS_TEXT,
-            chat_id=query.message.chat_id,
-            message_id=query.message.message_id
-        )
+        else:
+            # try to upload file
+            if download_directory.endswith("mp3"):
+                bot.send_audio(
+                    chat_id=query.message.chat_id,
+                    audio=open(download_directory, 'rb'),
+                    caption=description,
+                    duration=response_json["duration"],
+                    performer=response_json["uploader"],
+                    title=response_json["title"],
+                    reply_markup=reply_markup,
+                    thumb=thumb_image_path,
+                    reply_to=query.message.reply_to_message.message_id
+                )
+            elif download_directory.endswith("mp4"):
+                bot.send_video(
+                    chat_id=query.message.chat_id,
+                    video=open(download_directory, 'rb'),
+                    caption=description,
+                    # duration=response_json["duration"],
+                    # width=response_json["width"],
+                    # height=response_json["height"],
+                    supports_streaming=True,
+                    reply_markup=reply_markup,
+                    thumb=thumb_image_path,
+                    reply_to=query.message.reply_to_message.message_id
+                )
+            else:
+                bot.send_document(
+                    chat_id=query.message.chat_id,
+                    document=open(download_directory, 'rb'),
+                    caption=description,
+                    reply_markup=reply_markup,
+                    thumb=thumb_image_path,
+                    reply_to=query.message.reply_to_message.message_id
+                )
+            os.remove(download_directory)
+            os.remove(thumb_image_path)
+            bot.delete_message(
+                chat_id=query.message.chat_id,
+                message_id=query.message.message_id
+            )
 
 
 def DoUpload(chat_id, video_file, caption, thumb_image, message_id):
@@ -367,15 +356,20 @@ if __name__ == "__main__" :
         client.sign_in(bot_token=Config.TG_BOT_TOKEN)
     me = client.get_me()
     logger.info(me.stringify())
-    dispatcher = updater.dispatcher
-    start_handler = CommandHandler('start', start)
-    dispatcher.add_handler(start_handler)
-    echo_handler = MessageHandler(Filters.entity(MessageEntity.URL) | Filters.entity(MessageEntity.TEXT_LINK), echo)
-    dispatcher.add_handler(echo_handler)
+    updater.dispatcher.add_handler(CommandHandler('start', start))
+    updater.dispatcher.add_handler(MessageHandler(Filters.entity(MessageEntity.URL) | Filters.entity(MessageEntity.TEXT_LINK), echo))
     updater.dispatcher.add_handler(CallbackQueryHandler(button))
     updater.dispatcher.add_error_handler(error)
     # Start the Bot
-    updater.start_polling()
+    if bool(os.environ.get("WEBHOOK", False)):
+        updater.bot.set_webhook(url=Config.HTTP_DOMAIN + Config.TG_BOT_TOKEN)
+        updater.start_webhook(
+            listen="0.0.0.0",
+            port=Config.PORT,
+            url_path=Config.TG_BOT_TOKEN
+        )
+    else:
+        updater.start_polling()
     # Run the bot until the user presses Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT
     updater.idle()

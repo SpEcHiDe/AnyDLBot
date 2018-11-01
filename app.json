@@ -1,0 +1,47 @@
+{
+  "name": "AnyDLBot",
+  "description": "Telegram's best YouTube Downloader. Create your Fork now.",
+  "keywords": [
+    "telegram",
+    "best",
+    "youtube",
+    "downloader",
+    "3"
+  ],
+  "repository": "https://github.com/SpEcHiDe/AnyDLBot",
+  "env": {
+    "WEBHOOK": {
+      "description": "Setting this to ANYTHING will enable webhooks when in env mode messages",
+      "value": "ANYTHING"
+    },
+    "TG_BOT_TOKEN": {
+      "description": "Your bot token, as a string.",
+      "value": ""
+    },
+    "HTTP_DOMAIN": {
+      "description": "The Heroku App URL similar to https://<appname>.herokuapp.com/",
+      "value": "https://example.com/"
+    },
+    "PORT": {
+      "description": "Port to use for your webhooks",
+      "value": "5000"
+    },
+    "CHAT_BASE_TOKEN": {
+      "description": "Your chat base token, as a string.",
+      "value": ""
+    },
+    "APP_ID": {
+      "description": "Get this value from https://my.telegram.org",
+      "value": ""
+    },
+    "API_HASH": {
+      "description": "Get this value from https://my.telegram.org",
+      "value": ""
+    }
+  },
+  "addons": [
+  ],
+  "buildpacks": [{
+    "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest"
+  }]
+}

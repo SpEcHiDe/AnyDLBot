@@ -3,7 +3,13 @@
 
 A YouTube-DL wrapper inside Telegram.
 
-#### Installation
+### Installation
+
+#### The Easy Way
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+#### The Hard Way
 
 ```sh
 virtualenv -p python3 VENV
@@ -19,4 +25,3 @@ python bot.py
 
 #### LICENSE
 - GPLv3
-

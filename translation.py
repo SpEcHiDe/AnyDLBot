@@ -1,5 +1,10 @@
-
 class Translation(object):
-    START_TEXT = "Please send me any video link. Supported Sites: https://rg3.github.io/youtube-dl/supportedsites.html \nSource Code: https://github.com/SpEcHiDe/AnyDLBot"
+    START_TEXT = "Please send me any video link. Supported Sites: https://rg3.github.io/youtube-dl/supportedsites.html \nSource Code: https://github.com/SpEcHiDe/AnyDLBot \n© @AnyDLBot"
     ABS_TEXT = " Please don't be selfish."
     UPGRADE_TEXT = "No upgrades!"
+    FORMAT_SELECTION = "Select the desired format: [file size might be approximate]({}) "
+    NOYES_URL = "@GetPublicLinkBot URL detected. Please do not abuse the service!"
+    DOWNLOAD_START = "trying to download"
+    UPLOAD_START = "trying to upload"
+    RCHD_BOT_API_LIMIT = "size greater than maximum allowed size (50MB). Neverthless, trying to upload."
+    RCHD_TG_API_LIMIT = "Sorry. But, I cannot upload files greater than 1.5GB due to Telegram API limitations."
