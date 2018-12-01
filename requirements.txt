@@ -1,7 +1,4 @@
-hachoir3
-python-telegram-bot
 requests
-Telethon
 youtube-dl
 git+git://github.com/google/chatbase-python.git
-
+pyrogram[fast]
