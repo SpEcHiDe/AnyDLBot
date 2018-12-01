@@ -98,7 +98,7 @@ def echo(bot, update):
                 bot.send_message(
                     chat_id=update.from_user.id,
                     text=exc.output.decode("UTF-8"),
-                    reply_to_message_id=update.message.message_id
+                    reply_to_message_id=update.message_id
                 )
             else:
                 logger.info(t_response)
