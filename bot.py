@@ -188,7 +188,7 @@ def button(bot, update):
             "youtube-dl",
             "--embed-subs",
             "-f", youtube_dl_format,
-            "--recode-video", "mp4", "-k"
+            "--recode-video", "mp4", "-k",
             "--hls-prefer-ffmpeg", youtube_dl_url,
             "-o", download_directory
         ]
@@ -201,7 +201,7 @@ def button(bot, update):
             chat_id=update.from_user.id,
             message_id=update.message.message_id,
             text=exc.output.decode("UTF-8"),
-            reply_markup=reply_markup
+            # reply_markup=reply_markup
         )
     else:
         logger.info(t_response)
@@ -258,7 +258,8 @@ def button(bot, update):
             bot.edit_message_text(
                 text=Translation.AFTER_SUCCESSFUL_UPLOAD_MSG,
                 chat_id=update.from_user.id,
-                message_id=update.message.message_id
+                message_id=update.message.message_id,
+                disable_web_page_preview=True
             )
 
 
