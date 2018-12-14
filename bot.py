@@ -3,7 +3,8 @@
 
 # the logging things
 import logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 import subprocess
@@ -11,6 +12,9 @@ import math
 import requests
 import os
 import json
+
+# https://stackoverflow.com/a/37631799/4723940
+from PIL import Image
 
 # the secret configuration specific things
 if bool(os.environ.get("WEBHOOK", False)):
@@ -22,6 +26,7 @@ from translation import Translation
 
 # the Telegram trackings
 from chatbase import Message
+
 
 def TRChatBase(chat_id, message_text, intent):
     msg = Message(api_key=Config.CHAT_BASE_TOKEN,
@@ -218,6 +223,14 @@ def button(bot, update):
                 message_id=update.message.message_id
             )
         else:
+            # resize image
+            # ref: https://t.me/PyrogramChat/44663
+            # https://stackoverflow.com/a/21669827/4723940
+            Image.open(thumb_image_path).convert("RGB").save(thumb_image_path)
+            img = Image.open(thumb_image_path)
+            # https://stackoverflow.com/a/37631799/4723940
+            new_img = img.resize((90, 90))
+            new_img.save(thumb_image_path + ".jpg", "JPEG", optimize=True)
             # try to upload file
             if download_directory.endswith("mp3"):
                 bot.send_audio(
@@ -228,7 +241,7 @@ def button(bot, update):
                     # performer=response_json["uploader"],
                     # title=response_json["title"],
                     # reply_markup=reply_markup,
-                    thumb=thumb_image_path,
+                    thumb=thumb_image_path + ".jpg",
                     reply_to_message_id=update.message.reply_to_message.message_id
                 )
             elif download_directory.endswith("mp4"):
@@ -241,7 +254,7 @@ def button(bot, update):
                     # height=response_json["height"],
                     supports_streaming=True,
                     # reply_markup=reply_markup,
-                    thumb=thumb_image_path,
+                    thumb=thumb_image_path + ".jpg",
                     reply_to_message_id=update.message.reply_to_message.message_id
                 )
             else:
@@ -250,11 +263,12 @@ def button(bot, update):
                     document=download_directory,
                     caption=description,
                     # reply_markup=reply_markup,
-                    thumb=thumb_image_path,
+                    thumb=thumb_image_path + ".jpg",
                     reply_to_message_id=update.message.reply_to_message.message_id
                 )
             os.remove(download_directory)
             os.remove(thumb_image_path)
+            os.remove(thumb_image_path + ".jpg")
             bot.edit_message_text(
                 text=Translation.AFTER_SUCCESSFUL_UPLOAD_MSG,
                 chat_id=update.from_user.id,
