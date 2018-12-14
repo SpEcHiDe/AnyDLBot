@@ -83,6 +83,13 @@ def start(bot, update):
 def echo(bot, update):
     logger.info(update)
     TRChatBase(update.from_user.id, update.text, "/echo")
+    if str(update.from_user.id) not in Config.AUTH_USERS:
+        bot.send_message(
+            chat_id=update.from_user.id,
+            text=Translation.NOT_AUTH_USER_TEXT,
+            reply_to_message_id=update.message_id
+        )
+        return
     bot.send_chat_action(
         chat_id=update.from_user.id,
         action="typing"
@@ -163,6 +170,13 @@ def echo(bot, update):
 
 def button(bot, update):
     logger.info(update)
+    if str(update.from_user.id) not in Config.AUTH_USERS:
+        bot.send_message(
+            chat_id=update.from_user.id,
+            text=Translation.NOT_AUTH_USER_TEXT,
+            reply_to_message_id=update.message_id
+        )
+        return
     if update.data.find(":") == -1:
         return ""
     youtube_dl_format, youtube_dl_ext = update.data.split(":")
