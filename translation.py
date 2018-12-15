@@ -10,3 +10,4 @@ class Translation(object):
     RCHD_TG_API_LIMIT = "Sorry. But, I cannot upload files greater than 1.5GB due to Telegram API limitations."
     AFTER_SUCCESSFUL_UPLOAD_MSG = "Please rate me if you find me useful. https://t.me/storebot?start=AnyDLBot"
     NOT_AUTH_USER_TEXT = "The bot developer is a selfish gay."
+    SAVED_CUSTOM_THUMB_NAIL = "Custom video thumbnail saved. This image will be used in the above video."

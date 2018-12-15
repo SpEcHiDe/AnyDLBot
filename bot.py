@@ -80,6 +80,21 @@ def start(bot, update):
     )
 
 
+def save_photo(bot, update):
+    logger.info(update)
+    TRChatBase(update.from_user.id, update.text, "save_photo")
+    download_location = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg"
+    bot.download_media(
+        message=update,
+        file_name=download_location
+    )
+    bot.send_message(
+        chat_id=update.from_user.id,
+        text=Translation.SAVED_CUSTOM_THUMB_NAIL,
+        reply_to_message_id=update.message_id
+    )
+
+
 def echo(bot, update):
     logger.info(update)
     TRChatBase(update.from_user.id, update.text, "/echo")
@@ -302,5 +317,6 @@ if __name__ == "__main__" :
     )
     app.add_handler(pyrogram.MessageHandler(start, pyrogram.Filters.command(["start"])))
     app.add_handler(pyrogram.MessageHandler(echo, pyrogram.Filters.text))
+    app.add_handler(pyrogram.MessageHandler(save_photo, pyrogram.Filters.photo))
     app.add_handler(pyrogram.CallbackQueryHandler(button))
     app.run()
