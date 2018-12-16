@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 # (c) Shrimadhav U K
 
 # the logging things
@@ -12,6 +13,9 @@ import math
 import requests
 import os
 import json
+
+from hachoir.metadata import extractMetadata
+from hachoir.parser import createParser
 
 # https://stackoverflow.com/a/37631799/4723940
 from PIL import Image
@@ -260,13 +264,26 @@ def button(bot, update):
             # https://stackoverflow.com/a/37631799/4723940
             new_img = img.resize((90, 90))
             new_img.save(thumb_image_path + ".jpg", "JPEG", optimize=True)
+            # get the correct width, height, and duration for videos greater than 10MB
+            # ref: message from @BotSupport
+            width = 0
+            height = 0
+            duration = 0
+            metadata = extractMetadata(createParser(download_directory))
+            if metadata.has("duration"):
+                duration = metadata.get('duration').seconds
+            if metadata.has("width"):
+                width = metadata.get("width")
+            if metadata.has("height"):
+                height = metadata.get("height")
+            # get the correct width, height, and duration for videos greater than 10MB
             # try to upload file
             if download_directory.endswith("mp3"):
                 bot.send_audio(
                     chat_id=update.from_user.id,
                     audio=download_directory,
                     caption=description,
-                    # duration=response_json["duration"],
+                    duration=duration,
                     # performer=response_json["uploader"],
                     # title=response_json["title"],
                     # reply_markup=reply_markup,
@@ -278,9 +295,9 @@ def button(bot, update):
                     chat_id=update.from_user.id,
                     video=download_directory,
                     caption=description,
-                    # duration=response_json["duration"],
-                    # width=response_json["width"],
-                    # height=response_json["height"],
+                    duration=duration,
+                    width=width,
+                    height=height,
                     supports_streaming=True,
                     # reply_markup=reply_markup,
                     thumb=thumb_image_path + ".jpg",
