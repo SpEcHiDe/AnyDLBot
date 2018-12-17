@@ -263,7 +263,7 @@ def button(bot, update):
             img = Image.open(thumb_image_path)
             # https://stackoverflow.com/a/37631799/4723940
             new_img = img.resize((90, 90))
-            new_img.save(thumb_image_path + ".jpg", "JPEG", optimize=True)
+            new_img.save(thumb_image_path, "JPEG", optimize=True)
             # get the correct width, height, and duration for videos greater than 10MB
             # ref: message from @BotSupport
             width = 0
@@ -272,7 +272,7 @@ def button(bot, update):
             metadata = extractMetadata(createParser(download_directory))
             if metadata.has("duration"):
                 duration = metadata.get('duration').seconds
-            metadata = extractMetadata(createParser(thumb_image_path + ".jpg"))
+            metadata = extractMetadata(createParser(thumb_image_path))
             if metadata.has("width"):
                 width = metadata.get("width")
             if metadata.has("height"):
@@ -288,7 +288,7 @@ def button(bot, update):
                     # performer=response_json["uploader"],
                     # title=response_json["title"],
                     # reply_markup=reply_markup,
-                    thumb=thumb_image_path + ".jpg",
+                    thumb=thumb_image_path,
                     reply_to_message_id=update.message.reply_to_message.message_id
                 )
             else:
@@ -301,7 +301,7 @@ def button(bot, update):
                     height=height,
                     supports_streaming=True,
                     # reply_markup=reply_markup,
-                    thumb=thumb_image_path + ".jpg",
+                    thumb=thumb_image_path,
                     reply_to_message_id=update.message.reply_to_message.message_id
                 )
             """else:
@@ -315,7 +315,6 @@ def button(bot, update):
                 )"""
             os.remove(download_directory)
             os.remove(thumb_image_path)
-            os.remove(thumb_image_path + ".jpg")
             bot.edit_message_text(
                 text=Translation.AFTER_SUCCESSFUL_UPLOAD_MSG,
                 chat_id=update.from_user.id,
