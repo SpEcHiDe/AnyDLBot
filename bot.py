@@ -272,6 +272,7 @@ def button(bot, update):
             metadata = extractMetadata(createParser(download_directory))
             if metadata.has("duration"):
                 duration = metadata.get('duration').seconds
+            metadata = extractMetadata(createParser(thumb_image_path + ".jpg"))
             if metadata.has("width"):
                 width = metadata.get("width")
             if metadata.has("height"):
@@ -290,7 +291,7 @@ def button(bot, update):
                     thumb=thumb_image_path + ".jpg",
                     reply_to_message_id=update.message.reply_to_message.message_id
                 )
-            elif download_directory.endswith("mp4"):
+            else:
                 bot.send_video(
                     chat_id=update.from_user.id,
                     video=download_directory,
@@ -303,7 +304,7 @@ def button(bot, update):
                     thumb=thumb_image_path + ".jpg",
                     reply_to_message_id=update.message.reply_to_message.message_id
                 )
-            else:
+            """else:
                 bot.send_document(
                     chat_id=update.from_user.id,
                     document=download_directory,
@@ -311,7 +312,7 @@ def button(bot, update):
                     # reply_markup=reply_markup,
                     thumb=thumb_image_path + ".jpg",
                     reply_to_message_id=update.message.reply_to_message.message_id
-                )
+                )"""
             os.remove(download_directory)
             os.remove(thumb_image_path)
             os.remove(thumb_image_path + ".jpg")
