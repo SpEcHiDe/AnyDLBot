@@ -256,14 +256,6 @@ def button(bot, update):
                 message_id=update.message.message_id
             )
         else:
-            # resize image
-            # ref: https://t.me/PyrogramChat/44663
-            # https://stackoverflow.com/a/21669827/4723940
-            Image.open(thumb_image_path).convert("RGB").save(thumb_image_path)
-            img = Image.open(thumb_image_path)
-            # https://stackoverflow.com/a/37631799/4723940
-            new_img = img.resize((90, 90))
-            new_img.save(thumb_image_path, "JPEG", optimize=True)
             # get the correct width, height, and duration for videos greater than 10MB
             # ref: message from @BotSupport
             width = 0
@@ -278,6 +270,14 @@ def button(bot, update):
             if metadata.has("height"):
                 height = metadata.get("height")
             # get the correct width, height, and duration for videos greater than 10MB
+            # resize image
+            # ref: https://t.me/PyrogramChat/44663
+            # https://stackoverflow.com/a/21669827/4723940
+            Image.open(thumb_image_path).convert("RGB").save(thumb_image_path)
+            img = Image.open(thumb_image_path)
+            # https://stackoverflow.com/a/37631799/4723940
+            new_img = img.resize((90, 90))
+            new_img.save(thumb_image_path, "JPEG", optimize=True)
             # try to upload file
             if download_directory.endswith("mp3"):
                 bot.send_audio(
