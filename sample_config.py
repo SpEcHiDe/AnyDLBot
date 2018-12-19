@@ -22,3 +22,5 @@ class Config(object):
     TG_MAX_FILE_SIZE = 14000000000
     # chunk size that should be used with requests
     CHUNK_SIZE = 128
+    # default thumbnail to be used in the videos
+    DEF_THUMB_NAIL_VID_S = "https://placehold.it/90x90"

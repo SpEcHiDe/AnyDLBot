@@ -85,7 +85,6 @@ def start(bot, update):
 
 
 def save_photo(bot, update):
-    logger.info(update)
     TRChatBase(update.from_user.id, update.text, "save_photo")
     download_location = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg"
     bot.download_media(
@@ -132,7 +131,7 @@ def echo(bot, update):
                     reply_to_message_id=update.message_id
                 )
             else:
-                logger.info(t_response)
+                # logger.info(t_response)
                 x_reponse = t_response.decode("UTF-8")
                 response_json = json.loads(x_reponse)
                 logger.info(response_json)
@@ -144,25 +143,29 @@ def echo(bot, update):
                     approx_file_size = ""
                     if "filesize" in formats:
                         approx_file_size = humanbytes(formats["filesize"])
-                    ikeyboard = [
-                        pyrogram.InlineKeyboardButton(
-                            "[" + format_string + "] (" + format_ext + " - " + approx_file_size + ")",
-                            callback_data=(format_id + ":" + format_ext).encode("UTF-8")
-                        )
-                    ]
-                    inline_keyboard.append(ikeyboard)
+                    cb_string = "{}|{}|{}".format("video", format_id, format_ext)
+                    if not "audio only" in format_string:
+                        ikeyboard = [
+                            pyrogram.InlineKeyboardButton(
+                                "[" + format_string + "] (" + format_ext + " - " + approx_file_size + ")",
+                                callback_data=(cb_string).encode("UTF-8")
+                            )
+                        ]
+                        inline_keyboard.append(ikeyboard)
+                cb_string = "{}|{}|{}".format("audio", "5", "mp3")
                 inline_keyboard.append([
-                    pyrogram.InlineKeyboardButton("MP3 " + "(" + "medium" + ")", callback_data="5:mp3".encode("UTF-8"))
+                    pyrogram.InlineKeyboardButton("MP3 " + "(" + "medium" + ")", callback_data=cb_string.encode("UTF-8"))
                 ])
+                cb_string = "{}|{}|{}".format("audio", "0", "mp3")
                 inline_keyboard.append([
-                    pyrogram.InlineKeyboardButton("MP3 " + "(" + "best" + ")", callback_data="0:mp3".encode("UTF-8"))
+                    pyrogram.InlineKeyboardButton("MP3 " + "(" + "best" + ")", callback_data=cb_string.encode("UTF-8"))
                 ])
                 reply_markup = pyrogram.InlineKeyboardMarkup(inline_keyboard)
                 logger.info(reply_markup)
-                thumbnail = "https://placehold.it/50x50"
+                thumbnail = Config.DEF_THUMB_NAIL_VID_S
                 if "thumbnail" in response_json:
                     thumbnail = response_json["thumbnail"]
-                thumbnail_image = "https://placehold.it/50x50"
+                thumbnail_image = Config.DEF_THUMB_NAIL_VID_S
                 if "thumbnail" in response_json:
                     response_json["thumbnail"]
                 thumb_image_path = DownLoadFile(thumbnail_image, Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg")
@@ -196,9 +199,9 @@ def button(bot, update):
             reply_to_message_id=update.message_id
         )
         return
-    if update.data.find(":") == -1:
+    if update.data.find("|") == -1:
         return ""
-    youtube_dl_format, youtube_dl_ext = update.data.split(":")
+    tg_send_type, youtube_dl_format, youtube_dl_ext = update.data.split("|")
     youtube_dl_url = update.message.reply_to_message.text
     thumb_image_path = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg"
     bot.edit_message_text(
@@ -220,13 +223,13 @@ def button(bot, update):
             "-o", download_directory
         ]
     else:
-        download_directory = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + "_" + youtube_dl_format + "." + youtube_dl_ext + ".mp4"
+        download_directory = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + "_" + youtube_dl_format + "." + youtube_dl_ext
         # command_to_exec = ["youtube-dl", "-f", youtube_dl_format, "--hls-prefer-ffmpeg", "--recode-video", "mp4", "-k", youtube_dl_url, "-o", download_directory]
         command_to_exec = [
             "youtube-dl",
             "--embed-subs",
             "-f", youtube_dl_format,
-            "--recode-video", "mp4", "-k",
+            "-k",
             "--hls-prefer-ffmpeg", youtube_dl_url,
             "-o", download_directory
         ]
