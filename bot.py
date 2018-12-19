@@ -44,6 +44,7 @@ def TRChatBase(chat_id, message_text, intent):
 
 import pyrogram
 
+logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
 def DownLoadFile(url, file_name):
     if not os.path.exists(file_name):
@@ -124,7 +125,7 @@ def get_doc(bot, update):
             reply_to_message_id=update.message_id
         )
         the_real_download_location = bot.download_media(
-            message=update,
+            message=update.reply_to_message,
             file_name=download_location
         )
         if the_real_download_location is not None:
@@ -133,7 +134,7 @@ def get_doc(bot, update):
                 chat_id=update.from_user.id,
                 message_id=a.message_id
             )
-            if the_real_download_location.endwith((".mp4", ".avi")):
+            if the_real_download_location.endswith((".mp4", ".avi")):
                 bot.edit_message_text(
                     text=Translation.UPLOAD_START,
                     chat_id=update.from_user.id,
@@ -146,7 +147,7 @@ def get_doc(bot, update):
                 width = 0
                 height = 0
                 duration = 0
-                metadata = extractMetadata(createParser(download_directory))
+                metadata = extractMetadata(createParser(the_real_download_location))
                 if metadata.has("duration"):
                     duration = metadata.get('duration').seconds
                 metadata = extractMetadata(createParser(thumb_image_path))
@@ -174,12 +175,13 @@ def get_doc(bot, update):
                     supports_streaming=True,
                     # reply_markup=reply_markup,
                     thumb=thumb_image_path,
-                    reply_to_message_id=update.message.reply_to_message.message_id
+                    reply_to_message_id=update.reply_to_message.message_id
                 )
                 bot.edit_message_text(
                     text=Translation.AFTER_SUCCESSFUL_UPLOAD_MSG,
                     chat_id=update.from_user.id,
-                    message_id=a.message_id
+                    message_id=a.message_id,
+                    disable_web_page_preview=True
                 )
             else:
                 bot.edit_message_text(
