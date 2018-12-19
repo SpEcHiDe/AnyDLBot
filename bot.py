@@ -86,6 +86,13 @@ def start(bot, update):
 
 def save_photo(bot, update):
     TRChatBase(update.from_user.id, update.text, "save_photo")
+    if str(update.from_user.id) not in Config.AUTH_USERS:
+        bot.send_message(
+            chat_id=update.from_user.id,
+            text=Translation.NOT_AUTH_USER_TEXT,
+            reply_to_message_id=update.message_id
+        )
+        return
     download_location = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg"
     bot.download_media(
         message=update,
@@ -96,6 +103,90 @@ def save_photo(bot, update):
         text=Translation.SAVED_CUSTOM_THUMB_NAIL,
         reply_to_message_id=update.message_id
     )
+
+
+def get_doc(bot, update):
+    TRChatBase(update.from_user.id, update.text, "converttovideo")
+    if str(update.from_user.id) not in Config.AUTH_USERS:
+        bot.send_message(
+            chat_id=update.from_user.id,
+            text=Translation.NOT_AUTH_USER_TEXT,
+            reply_to_message_id=update.message_id
+        )
+        return
+    if " " in update.text:
+        cmd, file_name = update.text.split(" ", 1)
+        description = " " + " \r\n© @AnyDLBot"
+        download_location = Config.DOWNLOAD_LOCATION + "/" + file_name
+        a = bot.send_message(
+            chat_id=update.from_user.id,
+            text=Translation.DOWNLOAD_START,
+            reply_to_message_id=update.message_id
+        )
+        the_real_download_location = bot.download_media(
+            message=update,
+            file_name=download_location
+        )
+        if the_real_download_location is not None:
+            bot.edit_message_text(
+                text=Translation.SAVED_RECVD_DOC_FILE,
+                chat_id=update.from_user.id,
+                message_id=a.message_id
+            )
+            if the_real_download_location.endwith((".mp4", ".avi")):
+                bot.edit_message_text(
+                    text=Translation.UPLOAD_START,
+                    chat_id=update.from_user.id,
+                    message_id=a.message_id
+                )
+                logger.info(the_real_download_location)
+                thumb_image_path = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg"
+                # get the correct width, height, and duration for videos greater than 10MB
+                # ref: message from @BotSupport
+                width = 0
+                height = 0
+                duration = 0
+                metadata = extractMetadata(createParser(download_directory))
+                if metadata.has("duration"):
+                    duration = metadata.get('duration').seconds
+                metadata = extractMetadata(createParser(thumb_image_path))
+                if metadata.has("width"):
+                    width = metadata.get("width")
+                if metadata.has("height"):
+                    height = metadata.get("height")
+                # get the correct width, height, and duration for videos greater than 10MB
+                # resize image
+                # ref: https://t.me/PyrogramChat/44663
+                # https://stackoverflow.com/a/21669827/4723940
+                Image.open(thumb_image_path).convert("RGB").save(thumb_image_path)
+                img = Image.open(thumb_image_path)
+                # https://stackoverflow.com/a/37631799/4723940
+                new_img = img.resize((90, 90))
+                new_img.save(thumb_image_path, "JPEG", optimize=True)
+                # try to upload file
+                bot.send_video(
+                    chat_id=update.from_user.id,
+                    video=the_real_download_location,
+                    caption=description,
+                    duration=duration,
+                    width=width,
+                    height=height,
+                    supports_streaming=True,
+                    # reply_markup=reply_markup,
+                    thumb=thumb_image_path,
+                    reply_to_message_id=update.message.reply_to_message.message_id
+                )
+                bot.edit_message_text(
+                    text=Translation.AFTER_SUCCESSFUL_UPLOAD_MSG,
+                    chat_id=update.from_user.id,
+                    message_id=a.message_id
+                )
+            else:
+                bot.edit_message_text(
+                    text=Translation.ABS_TEXT,
+                    chat_id=update.from_user.id,
+                    message_id=a.message_id
+                )
 
 
 def echo(bot, update):
@@ -336,6 +427,7 @@ if __name__ == "__main__" :
         api_hash=Config.API_HASH
     )
     app.add_handler(pyrogram.MessageHandler(start, pyrogram.Filters.command(["start"])))
+    app.add_handler(pyrogram.MessageHandler(get_doc, pyrogram.Filters.command(["converttovideo"])))
     app.add_handler(pyrogram.MessageHandler(echo, pyrogram.Filters.text))
     app.add_handler(pyrogram.MessageHandler(save_photo, pyrogram.Filters.photo))
     app.add_handler(pyrogram.CallbackQueryHandler(button))
