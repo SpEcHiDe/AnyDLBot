@@ -177,6 +177,8 @@ def get_doc(bot, update):
                     thumb=thumb_image_path,
                     reply_to_message_id=update.reply_to_message.message_id
                 )
+                os.remove(the_real_download_location)
+                os.remove(thumb_image_path)
                 bot.edit_message_text(
                     text=Translation.AFTER_SUCCESSFUL_UPLOAD_MSG,
                     chat_id=update.from_user.id,
