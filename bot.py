@@ -42,10 +42,6 @@ def TRChatBase(chat_id, message_text, intent):
     resp = msg.send()
 
 
-import pyrogram
-
-logging.getLogger("pyrogram").setLevel(logging.WARNING)
-
 def DownLoadFile(url, file_name):
     if not os.path.exists(file_name):
         r = requests.get(url, allow_redirects=True, stream=True)
@@ -67,6 +63,10 @@ def humanbytes(size):
         size /=  power
         n += 1
     return str(math.floor(size)) + " " + Dic_powerN[n] + 'B'
+
+
+import pyrogram
+logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
 
 ## The telegram Specific Functions
@@ -117,7 +117,7 @@ def get_doc(bot, update):
         return
     if " " in update.text:
         cmd, file_name = update.text.split(" ", 1)
-        description = " " + " \r\n© @AnyDLBot"
+        description = Translation.CUSTOM_CAPTION_UL_FILE
         download_location = Config.DOWNLOAD_LOCATION + "/" + file_name
         a = bot.send_message(
             chat_id=update.from_user.id,
@@ -210,9 +210,61 @@ def echo(bot, update):
     text = update.text
     if(text.startswith("http")):
         url = text
-        # logger = "<a href='" + url + "'>url</a> by <a href='tg://user?id=" + str(update.from_user.id) + "'>" + str(update.from_user.id) + "</a>"
-        # bot.send_message(chat_id=-1001364708459, text=logger, parse_mode="HTML")
-        if "noyes.in" not in url:
+        if "|" in url:
+            thumb_image_path = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg"
+            if os.path.exists(thumb_image_path):
+                url, file_name = url.split("|")
+                logger.info(url)
+                logger.info(file_name)
+                a = bot.send_message(
+                    chat_id=update.from_user.id,
+                    text=Translation.DOWNLOAD_START,
+                    reply_to_message_id=update.message_id
+                )
+                after_download_path = DownLoadFile(url, Config.DOWNLOAD_LOCATION + "/" + file_name)
+                description = Translation.CUSTOM_CAPTION_UL_FILE
+                bot.edit_message_text(
+                    text=Translation.SAVED_RECVD_DOC_FILE,
+                    chat_id=update.from_user.id,
+                    message_id=a.message_id
+                )
+                # resize image
+                # ref: https://t.me/PyrogramChat/44663
+                # https://stackoverflow.com/a/21669827/4723940
+                Image.open(thumb_image_path).convert("RGB").save(thumb_image_path)
+                img = Image.open(thumb_image_path)
+                # https://stackoverflow.com/a/37631799/4723940
+                new_img = img.resize((90, 90))
+                new_img.save(thumb_image_path, "JPEG", optimize=True)
+                bot.edit_message_text(
+                    text=Translation.UPLOAD_START,
+                    chat_id=update.from_user.id,
+                    message_id=a.message_id
+                )
+                # try to upload file
+                bot.send_document(
+                    chat_id=update.from_user.id,
+                    document=after_download_path,
+                    caption=description,
+                    # reply_markup=reply_markup,
+                    thumb=thumb_image_path,
+                    reply_to_message_id=update.message_id
+                )
+                os.remove(after_download_path)
+                os.remove(thumb_image_path)
+                bot.edit_message_text(
+                    text=Translation.AFTER_SUCCESSFUL_UPLOAD_MSG,
+                    chat_id=update.from_user.id,
+                    message_id=a.message_id,
+                    disable_web_page_preview=True
+                )
+            else:
+                bot.send_message(
+                    chat_id=update.from_user.id,
+                    text=Translation.NO_CUSTOM_THUMB_NAIL_FOUND,
+                    reply_to_message_id=update.message_id
+                )
+        else:
             try:
                 command_to_exec = ["youtube-dl", "--no-warnings", "-j", url]
                 logger.info(command_to_exec)
@@ -271,12 +323,6 @@ def echo(bot, update):
                     parse_mode=pyrogram.ParseMode.HTML,
                     reply_to_message_id=update.message_id
                 )
-        else:
-            bot.send_message(
-                chat_id=update.from_user.id,
-                text=Translation.NOYES_URL,
-                reply_to_message_id=update.message_id
-            )
     else:
         bot.send_message(
             chat_id=update.from_user.id,
@@ -304,7 +350,7 @@ def button(bot, update):
         chat_id=update.from_user.id,
         message_id=update.message.message_id
     )
-    description = " " + " \r\n© @AnyDLBot"
+    description = Translation.CUSTOM_CAPTION_UL_FILE
     download_directory = ""
     command_to_exec = []
     if "mp3" in youtube_dl_ext:
@@ -402,15 +448,6 @@ def button(bot, update):
                     thumb=thumb_image_path,
                     reply_to_message_id=update.message.reply_to_message.message_id
                 )
-            """else:
-                bot.send_document(
-                    chat_id=update.from_user.id,
-                    document=download_directory,
-                    caption=description,
-                    # reply_markup=reply_markup,
-                    thumb=thumb_image_path + ".jpg",
-                    reply_to_message_id=update.message.reply_to_message.message_id
-                )"""
             os.remove(download_directory)
             os.remove(thumb_image_path)
             bot.edit_message_text(
