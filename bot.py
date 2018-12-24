@@ -155,13 +155,9 @@ def rename_doc(bot, update):
             bot.send_document(
                 chat_id=update.from_user.id,
                 document=the_real_download_location,
-                caption=description,
-                duration=duration,
-                width=width,
-                height=height,
-                supports_streaming=True,
-                # reply_markup=reply_markup,
                 thumb=thumb_image_path,
+                caption=description,
+                # reply_markup=reply_markup,
                 reply_to_message_id=update.reply_to_message.message_id
             )
             os.remove(the_real_download_location)
