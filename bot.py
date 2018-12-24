@@ -106,6 +106,74 @@ def save_photo(bot, update):
     )
 
 
+def rename_doc(bot, update):
+    TRChatBase(update.from_user.id, update.text, "rename")
+    if str(update.from_user.id) not in Config.AUTH_USERS:
+        bot.send_message(
+            chat_id=update.from_user.id,
+            text=Translation.NOT_AUTH_USER_TEXT,
+            reply_to_message_id=update.message_id
+        )
+        return
+    if " " in update.text:
+        cmd, file_name = update.text.split(" ", 1)
+        description = Translation.CUSTOM_CAPTION_UL_FILE
+        download_location = Config.DOWNLOAD_LOCATION + "/" + file_name
+        a = bot.send_message(
+            chat_id=update.from_user.id,
+            text=Translation.DOWNLOAD_START,
+            reply_to_message_id=update.message_id
+        )
+        the_real_download_location = bot.download_media(
+            message=update.reply_to_message,
+            file_name=download_location
+        )
+        if the_real_download_location is not None:
+            bot.edit_message_text(
+                text=Translation.SAVED_RECVD_DOC_FILE,
+                chat_id=update.from_user.id,
+                message_id=a.message_id
+            )
+            bot.edit_message_text(
+                text=Translation.UPLOAD_START,
+                chat_id=update.from_user.id,
+                message_id=a.message_id
+            )
+            logger.info(the_real_download_location)
+            thumb_image_path = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg"
+            if not os.path.exists(thumb_image_path):
+                thumb_image_path = None
+            else:
+                # resize image
+                # ref: https://t.me/PyrogramChat/44663
+                # https://stackoverflow.com/a/21669827/4723940
+                Image.open(thumb_image_path).convert("RGB").save(thumb_image_path)
+                img = Image.open(thumb_image_path)
+                # https://stackoverflow.com/a/37631799/4723940
+                new_img = img.resize((90, 90))
+                new_img.save(thumb_image_path, "JPEG", optimize=True)
+            bot.send_document(
+                chat_id=update.from_user.id,
+                document=the_real_download_location,
+                caption=description,
+                duration=duration,
+                width=width,
+                height=height,
+                supports_streaming=True,
+                # reply_markup=reply_markup,
+                thumb=thumb_image_path,
+                reply_to_message_id=update.reply_to_message.message_id
+            )
+            os.remove(the_real_download_location)
+            os.remove(thumb_image_path)
+            bot.edit_message_text(
+                text=Translation.AFTER_SUCCESSFUL_UPLOAD_MSG,
+                chat_id=update.from_user.id,
+                message_id=a.message_id,
+                disable_web_page_preview=True
+            )
+
+
 def get_doc(bot, update):
     TRChatBase(update.from_user.id, update.text, "converttovideo")
     if str(update.from_user.id) not in Config.AUTH_USERS:
@@ -212,22 +280,9 @@ def echo(bot, update):
         url = text
         if "|" in url:
             thumb_image_path = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg"
-            if os.path.exists(thumb_image_path):
-                url, file_name = url.split("|")
-                logger.info(url)
-                logger.info(file_name)
-                a = bot.send_message(
-                    chat_id=update.from_user.id,
-                    text=Translation.DOWNLOAD_START,
-                    reply_to_message_id=update.message_id
-                )
-                after_download_path = DownLoadFile(url, Config.DOWNLOAD_LOCATION + "/" + file_name)
-                description = Translation.CUSTOM_CAPTION_UL_FILE
-                bot.edit_message_text(
-                    text=Translation.SAVED_RECVD_DOC_FILE,
-                    chat_id=update.from_user.id,
-                    message_id=a.message_id
-                )
+            if not os.path.exists(thumb_image_path):
+                thumb_image_path = None
+            else:
                 # resize image
                 # ref: https://t.me/PyrogramChat/44663
                 # https://stackoverflow.com/a/21669827/4723940
@@ -236,34 +291,43 @@ def echo(bot, update):
                 # https://stackoverflow.com/a/37631799/4723940
                 new_img = img.resize((90, 90))
                 new_img.save(thumb_image_path, "JPEG", optimize=True)
-                bot.edit_message_text(
-                    text=Translation.UPLOAD_START,
-                    chat_id=update.from_user.id,
-                    message_id=a.message_id
-                )
-                # try to upload file
-                bot.send_document(
-                    chat_id=update.from_user.id,
-                    document=after_download_path,
-                    caption=description,
-                    # reply_markup=reply_markup,
-                    thumb=thumb_image_path,
-                    reply_to_message_id=update.message_id
-                )
-                os.remove(after_download_path)
-                os.remove(thumb_image_path)
-                bot.edit_message_text(
-                    text=Translation.AFTER_SUCCESSFUL_UPLOAD_MSG,
-                    chat_id=update.from_user.id,
-                    message_id=a.message_id,
-                    disable_web_page_preview=True
-                )
-            else:
-                bot.send_message(
-                    chat_id=update.from_user.id,
-                    text=Translation.NO_CUSTOM_THUMB_NAIL_FOUND,
-                    reply_to_message_id=update.message_id
-                )
+            url, file_name = url.split("|")
+            logger.info(url)
+            logger.info(file_name)
+            a = bot.send_message(
+                chat_id=update.from_user.id,
+                text=Translation.DOWNLOAD_START,
+                reply_to_message_id=update.message_id
+            )
+            after_download_path = DownLoadFile(url, Config.DOWNLOAD_LOCATION + "/" + file_name)
+            description = Translation.CUSTOM_CAPTION_UL_FILE
+            bot.edit_message_text(
+                text=Translation.SAVED_RECVD_DOC_FILE,
+                chat_id=update.from_user.id,
+                message_id=a.message_id
+            )
+            bot.edit_message_text(
+                text=Translation.UPLOAD_START,
+                chat_id=update.from_user.id,
+                message_id=a.message_id
+            )
+            # try to upload file
+            bot.send_document(
+                chat_id=update.from_user.id,
+                document=after_download_path,
+                caption=description,
+                # reply_markup=reply_markup,
+                thumb=thumb_image_path,
+                reply_to_message_id=update.message_id
+            )
+            os.remove(after_download_path)
+            os.remove(thumb_image_path)
+            bot.edit_message_text(
+                text=Translation.AFTER_SUCCESSFUL_UPLOAD_MSG,
+                chat_id=update.from_user.id,
+                message_id=a.message_id,
+                disable_web_page_preview=True
+            )
         else:
             try:
                 command_to_exec = ["youtube-dl", "--no-warnings", "-j", url]
@@ -310,11 +374,10 @@ def echo(bot, update):
                 reply_markup = pyrogram.InlineKeyboardMarkup(inline_keyboard)
                 logger.info(reply_markup)
                 thumbnail = Config.DEF_THUMB_NAIL_VID_S
-                if "thumbnail" in response_json:
-                    thumbnail = response_json["thumbnail"]
                 thumbnail_image = Config.DEF_THUMB_NAIL_VID_S
                 if "thumbnail" in response_json:
-                    response_json["thumbnail"]
+                    thumbnail = response_json["thumbnail"]
+                    thumbnail_image = response_json["thumbnail"]
                 thumb_image_path = DownLoadFile(thumbnail_image, Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg")
                 bot.send_message(
                     chat_id=update.from_user.id,
@@ -469,6 +532,7 @@ if __name__ == "__main__" :
     )
     app.add_handler(pyrogram.MessageHandler(start, pyrogram.Filters.command(["start"])))
     app.add_handler(pyrogram.MessageHandler(get_doc, pyrogram.Filters.command(["converttovideo"])))
+    app.add_handler(pyrogram.MessageHandler(rename_doc, pyrogram.Filters.command(["rename"])))
     app.add_handler(pyrogram.MessageHandler(echo, pyrogram.Filters.text))
     app.add_handler(pyrogram.MessageHandler(save_photo, pyrogram.Filters.photo))
     app.add_handler(pyrogram.CallbackQueryHandler(button))
