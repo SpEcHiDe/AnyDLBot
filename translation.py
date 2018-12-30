@@ -1,5 +1,5 @@
 class Translation(object):
-    START_TEXT = "Please send me any video link. Supported Sites: https://rg3.github.io/youtube-dl/supportedsites.html \nSource Code: https://github.com/SpEcHiDe/AnyDLBot \n© @AnyDLBot"
+    START_TEXT = "Please send me any video link. Supported Sites: https://rg3.github.io/youtube-dl/supportedsites.html \nSource Code: https://github.com/SpEcHiDe/AnyDLBot \n© @ABUtubeDLDLBot"
     ABS_TEXT = " Please don't be selfish."
     UPGRADE_TEXT = "No upgrades!"
     FORMAT_SELECTION = "Select the desired format: <a href='{}'>file size might be approximate</a> "
