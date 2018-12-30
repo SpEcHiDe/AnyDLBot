@@ -12,5 +12,5 @@ class Translation(object):
     NOT_AUTH_USER_TEXT = "The bot developer is a selfish gay."
     SAVED_CUSTOM_THUMB_NAIL = "Custom video thumbnail saved. This image will be used in the above video."
     SAVED_RECVD_DOC_FILE = "Document Downloaded Successfully."
-    CUSTOM_CAPTION_UL_FILE = " © @AnyDLBot"
+    CUSTOM_CAPTION_UL_FILE = " © @ABUtubeDLBot"
     NO_CUSTOM_THUMB_NAIL_FOUND = "No Custom THumbNail found. Please goto @UploadBot"
