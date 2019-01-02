@@ -30,3 +30,4 @@ class Translation(object):
     FF_MPEG_RO_BOT_RE_SURRECT_ED = """Reply to /getlink reply, with a timestamp (seperated by :) or a range of timestamps (seperated by ===)
 
 TimeStamp should be in the format HH:MM:SS"""
+    REPLY_TO_DOC_OR_LINK_FOR_RARX_SRT = "Reply to a HTTP link, to extract embedded subtitle"
