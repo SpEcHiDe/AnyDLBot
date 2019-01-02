@@ -41,6 +41,16 @@
     "AUTH_USERS": {
       "description": "allow only pre-defined users to use this bot",
       "value": "7351948 20516707 23122162 500346573"
+    },
+    "DEF_THUMB_NAIL_VID_S": {
+      "description": "default thumbnail to be used in the videos. Incase, youtube-dl is unable to find a thumbnail.",
+      "value": "",
+      "required": false
+    },
+    "HTTP_PROXY": {
+      "description": "proxy for accessing youtube-dl in GeoRestricted Areas. Get your own proxy from https://github.com/rg3/youtube-dl/issues/1091#issuecomment-230163061",
+      "value": "",
+      "required": false
     }
   },
   "addons": [

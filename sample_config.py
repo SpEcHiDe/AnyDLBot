@@ -15,12 +15,21 @@ class Config(object):
     # Get these values from my.telegram.org
     # Array to store users who are authorized to use the bot
     AUTH_USERS = set(str(x) for x in os.environ.get("AUTH_USERS", "").split())
+    # reg: Procedures
+    UTUBE_BOT_USERS = AUTH_USERS
+    SUPER_DLBOT_USERS = AUTH_USERS
+    SUPER3X_DLBOT_USERS = AUTH_USERS
+    SUPER7X_DLBOT_USERS = AUTH_USERS
+    # Wat was I thinking? :\
     # the download location, where the HTTP Server runs
     DOWNLOAD_LOCATION = "./DOWNLOADS"
     # Telegram maximum file upload size
     MAX_FILE_SIZE = 50000000
-    TG_MAX_FILE_SIZE = 14000000000
+    TG_MAX_FILE_SIZE = 1572864000
     # chunk size that should be used with requests
     CHUNK_SIZE = 128
     # default thumbnail to be used in the videos
-    DEF_THUMB_NAIL_VID_S = "https://placehold.it/90x90"
+    DEF_THUMB_NAIL_VID_S = os.environ.get("DEF_THUMB_NAIL_VID_S", "https://placehold.it/90x90")
+    # proxy for accessing youtube-dl in GeoRestricted Areas
+    # Get your own proxy from https://github.com/rg3/youtube-dl/issues/1091#issuecomment-230163061
+    HTTP_PROXY = os.environ.get("HTTP_PROXY", "")
