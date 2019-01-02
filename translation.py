@@ -18,8 +18,7 @@ class Translation(object):
     NO_VOID_FORMAT_FOUND = "Can you check the url? I am unable to detect video format from URL. If you think this could be a bug please report on https://github.com/spechide/AnyDLBot/issues"
     HELP_USER = """There are multiple things I can do:
 👉 All Supported Video Formats of https://rg3.github.io/youtube-dl/supportedsites.html
-👉 Upload as file from any HTTP link    USER_ADDED_TO_DB = "User <a href='tg://user?id={}'>{}</a> added to {} till {}."
-
+👉 Upload as file from any HTTP link
 👉 Convert To Streamable Video, any Telegram media
 👉 ReName Telegram files, with custom thumbnail support
 👉 Get High Speed Direct Download Link of any Telegram file

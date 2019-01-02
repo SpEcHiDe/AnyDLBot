@@ -1,7 +1,17 @@
-## AnyDLBot
+## [AnyDLBot](https://telegram.dog/AnyDLBot)
 ---
 
-A YouTube-DL wrapper inside Telegram.
+**There are multiple things I can do**:
+
+👉 All Supported Video Formats of https://rg3.github.io/youtube-dl/supportedsites.html
+
+👉 Upload as file from any HTTP link
+
+👉 Convert To Streamable Video, any Telegram media
+
+👉 ReName Telegram files, with custom thumbnail support
+
+👉 Get High Speed Direct Download Link of any Telegram file
 
 ### Installation
 
