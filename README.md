@@ -25,6 +25,8 @@
 
 #### The Hard Way
 
+[![](http://ouo.io/images/banners/r1.jpg "ouo.io - Make short links and earn the biggest money")](http://ouo.io/ref/ROXeyb0X)
+
 ```sh
 virtualenv -p python3 VENV
 . ./VENV/bin/activate
