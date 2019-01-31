@@ -9,6 +9,7 @@ logging.basicConfig(level=logging.DEBUG,
 logger = logging.getLogger(__name__)
 
 import os
+import requests
 import subprocess
 
 # the secret configuration specific things
@@ -23,35 +24,40 @@ from translation import Translation
 import pyrogram
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
-from plugins.helper_funcs.chat_base import TRChatBase
+from helper_funcs.chat_base import TRChatBase
+from helper_funcs.display_progress import progress_for_pyrogram
 
 
 @pyrogram.Client.on_message(pyrogram.Filters.command(["getlink"]))
 def get_link(bot, update):
     TRChatBase(update.from_user.id, update.text, "getlink")
-    if str(update.from_user.id) not in Config.SUPER3X_DLBOT_USERS:
+    if str(update.from_user.id) in Config.BANNED_USERS:
         bot.send_message(
-            chat_id=update.from_user.id,
-            text=Translation.NOT_AUTH_USER_TEXT,
-            reply_to_message_id=update.message_id
+            chat_id=update.chat.id,
+            text=Translation.ABUSIVE_USERS,
+            reply_to_message_id=update.message_id,
+            disable_web_page_preview=True,
+            parse_mode=pyrogram.ParseMode.HTML
         )
         return
     if update.reply_to_message is not None:
         reply_message = update.reply_to_message
         download_location = Config.DOWNLOAD_LOCATION + "/"
         a = bot.send_message(
-            chat_id=update.from_user.id,
+            chat_id=update.chat.id,
             text=Translation.DOWNLOAD_START,
             reply_to_message_id=update.message_id
         )
         after_download_file_name = bot.download_media(
             message=reply_message,
-            file_name=download_location
+            file_name=download_location,
+            progress=progress_for_pyrogram,
+            progress_args=(Translation.DOWNLOAD_START, a.message_id, update.chat.id)
         )
         download_extension = after_download_file_name.rsplit(".", 1)[-1]
         bot.edit_message_text(
             text=Translation.SAVED_RECVD_DOC_FILE,
-            chat_id=update.from_user.id,
+            chat_id=update.chat.id,
             message_id=a.message_id
         )
         url = "https://transfer.sh/{}.{}".format(str(update.from_user.id), str(download_extension))
@@ -65,7 +71,7 @@ def get_link(bot, update):
         ]
         bot.edit_message_text(
             text=Translation.UPLOAD_START,
-            chat_id=update.from_user.id,
+            chat_id=update.chat.id,
             message_id=a.message_id
         )
         try:
@@ -74,15 +80,18 @@ def get_link(bot, update):
         except subprocess.CalledProcessError as exc:
             logger.info("Status : FAIL", exc.returncode, exc.output)
             bot.edit_message_text(
-                chat_id=update.from_user.id,
+                chat_id=update.chat.id,
                 text=exc.output.decode("UTF-8"),
                 message_id=a.message_id
             )
         else:
+            logger.info(t_response)
             t_response_arry = t_response.decode("UTF-8").split("\n")[-1].strip()
+            shorten_api_url = "http://ouo.io/api/{}?s={}".format(Config.OUO_IO_API_KEY, t_response_arry)
+            adfulurl = requests.get(shorten_api_url).text
             bot.edit_message_text(
-                chat_id=update.from_user.id,
-                text=Translation.AFTER_GET_DL_LINK.format(t_response_arry, max_days),
+                chat_id=update.chat.id,
+                text=Translation.AFTER_GET_DL_LINK.format(adfulurl, max_days),
                 parse_mode=pyrogram.ParseMode.HTML,
                 message_id=a.message_id,
                 disable_web_page_preview=True
@@ -93,7 +102,7 @@ def get_link(bot, update):
                 pass
     else:
         bot.send_message(
-            chat_id=update.from_user.id,
+            chat_id=update.chat.id,
             text=Translation.REPLY_TO_DOC_GET_LINK,
             reply_to_message_id=update.message_id
         )

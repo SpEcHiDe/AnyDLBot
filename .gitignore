@@ -214,3 +214,4 @@ config.py
 /DOWNLOADS
 *.session
 *.session*
+*.DB

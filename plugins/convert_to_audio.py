@@ -9,6 +9,7 @@ logging.basicConfig(level=logging.DEBUG,
 logger = logging.getLogger(__name__)
 
 import os
+import time
 
 # the secret configuration specific things
 if bool(os.environ.get("WEBHOOK", False)):
@@ -31,18 +32,17 @@ from hachoir.parser import createParser
 from PIL import Image
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.command(["rename"]))
-def rename_doc(bot, update):
-    TRChatBase(update.from_user.id, update.text, "rename")
-    if str(update.from_user.id) not in Config.SUPER3X_DLBOT_USERS:
+@pyrogram.Client.on_message(pyrogram.Filters.command(["converttoaudio"]))
+def convert_to_audio(bot, update):
+    TRChatBase(update.from_user.id, update.text, "converttoaudio")
+    if str(update.from_user.id) not in Config.SUPER_DLBOT_USERS:
         bot.send_message(
             chat_id=update.chat.id,
             text=Translation.NOT_AUTH_USER_TEXT,
             reply_to_message_id=update.message_id
         )
         return
-    if (" " in update.text) and (update.reply_to_message is not None):
-        cmd, file_name = update.text.split(" ", 1)
+    if (update.reply_to_message is not None) and (update.reply_to_message.media is not None) :
         description = Translation.CUSTOM_CAPTION_UL_FILE
         download_location = Config.DOWNLOAD_LOCATION + "/"
         a = bot.send_message(
@@ -62,32 +62,33 @@ def rename_doc(bot, update):
                 chat_id=update.chat.id,
                 message_id=a.message_id
             )
-            if "IndianMovie" in the_real_download_location:
-                bot.edit_message_text(
-                    text=Translation.RENAME_403_ERR,
-                    chat_id=update.chat.id,
-                    message_id=a.message_id
-                )
-                return
-            new_file_name = download_location + file_name
-            os.rename(the_real_download_location, new_file_name)
+            # don't care about the extension
+            # convert video to audio format
+            audio_file_location_path = the_real_download_location
             bot.edit_message_text(
                 text=Translation.UPLOAD_START,
                 chat_id=update.chat.id,
                 message_id=a.message_id
             )
             logger.info(the_real_download_location)
+            # get the correct width, height, and duration for videos greater than 10MB
+            # ref: message from @BotSupport
+            width = 0
+            height = 0
+            duration = 0
+            metadata = extractMetadata(createParser(the_real_download_location))
+            if metadata.has("duration"):
+                duration = metadata.get('duration').seconds
             thumb_image_path = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg"
             if not os.path.exists(thumb_image_path):
                 thumb_image_path = None
             else:
-                width = 0
-                height = 0
                 metadata = extractMetadata(createParser(thumb_image_path))
                 if metadata.has("width"):
                     width = metadata.get("width")
                 if metadata.has("height"):
                     height = metadata.get("height")
+                # get the correct width, height, and duration for videos greater than 10MB
                 # resize image
                 # ref: https://t.me/PyrogramChat/44663
                 # https://stackoverflow.com/a/21669827/4723940
@@ -97,19 +98,24 @@ def rename_doc(bot, update):
                 img.thumbnail((90, 90))
                 img.save(thumb_image_path, "JPEG")
                 # https://pillow.readthedocs.io/en/3.1.x/reference/Image.html#create-thumbnails
-            bot.send_document(
+            # try to upload file
+            bot.send_audio(
                 chat_id=update.chat.id,
-                document=new_file_name,
-                thumb=thumb_image_path,
+                audio=audio_file_location_path,
                 caption=description,
+                duration=duration,
+                # performer="",
+                # title="",
                 # reply_markup=reply_markup,
+                thumb=thumb_image_path,
                 reply_to_message_id=update.reply_to_message.message_id,
                 progress=progress_for_pyrogram,
                 progress_args=(Translation.UPLOAD_START, a.message_id, update.chat.id)
             )
             try:
-                os.remove(the_real_download_location)
                 os.remove(thumb_image_path)
+                os.remove(the_real_download_location)
+                os.remove(audio_file_location_path)
             except:
                 pass
             bot.edit_message_text(
@@ -121,6 +127,6 @@ def rename_doc(bot, update):
     else:
         bot.send_message(
             chat_id=update.chat.id,
-            text=Translation.REPLY_TO_DOC_FOR_RENAME_FILE,
+            text=Translation.REPLY_TO_DOC_FOR_C2V,
             reply_to_message_id=update.message_id
         )

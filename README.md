@@ -21,11 +21,11 @@
 
 #### The Easy Way
 
+[![](http://ouo.io/images/banners/r1.jpg "ouo.io - Make short links and earn the biggest money")](http://ouo.io/ref/ROXeyb0X)
+
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 #### The Hard Way
-
-[![](http://ouo.io/images/banners/r1.jpg "ouo.io - Make short links and earn the biggest money")](http://ouo.io/ref/ROXeyb0X)
 
 ```sh
 virtualenv -p python3 VENV
