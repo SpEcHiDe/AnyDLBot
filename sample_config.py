@@ -16,13 +16,11 @@ class Config(object):
     # Array to store users who are authorized to use the bot
     AUTH_USERS = set(str(x) for x in os.environ.get("AUTH_USERS", "").split())
     # reg: Procedures
-    UTUBE_BOT_USERS = AUTH_USERS
-    SUPER_DLBOT_USERS = AUTH_USERS
-    SUPER3X_DLBOT_USERS = AUTH_USERS
-    SUPER7X_DLBOT_USERS = AUTH_USERS
-    BANNED_USERS = [
-        "7351948"
-    ]
+    UTUBE_BOT_USERS = []
+    SUPER_DLBOT_USERS = []
+    SUPER3X_DLBOT_USERS = []
+    SUPER7X_DLBOT_USERS = []
+    BANNED_USERS = []
     # Wat was I thinking? :\
     # the download location, where the HTTP Server runs
     DOWNLOAD_LOCATION = "./DOWNLOADS"
@@ -34,8 +32,19 @@ class Config(object):
     CHUNK_SIZE = int(os.environ.get("CHUNK_SIZE", 128))
     # default thumbnail to be used in the videos
     DEF_THUMB_NAIL_VID_S = os.environ.get("DEF_THUMB_NAIL_VID_S", "https://placehold.it/90x90")
+    # for storing the user details
+    DB_SQLALCHEMY = "USERS.session"
     # proxy for accessing youtube-dl in GeoRestricted Areas
     # Get your own proxy from https://github.com/rg3/youtube-dl/issues/1091#issuecomment-230163061
     HTTP_PROXY = os.environ.get("HTTP_PROXY", "")
     # https://t.me/hevcbay/951
     OUO_IO_API_KEY = ""
+    # for Google Custom Search Engine
+    GCS_API_KEY = os.environ.get("GCS_API_KEY", None)
+    GCS_SE_ID = os.environ.get("GCS_SE_ID", None)
+    # dict to hold the ReQuest queue
+    ADL_BOT_RQ = {}
+    # set timeout for subprocess
+    PROCESS_MAX_TIMEOUT = 3600
+    # dict to hold Google Drive SignIns
+    G_DRIVE_AUTH_DRQ = {}

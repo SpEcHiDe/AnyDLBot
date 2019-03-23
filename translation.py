@@ -1,15 +1,90 @@
 class Translation(object):
-    START_TEXT = "/help to know how to use me\n/upgrade for Premium Features\nSource Code: https://github.com/SpEcHiDe/AnyDLBot \n© @AnyDLBot"
+    START_TEXT = """Thank You for using me.
+/help to know how to use me
+Source Code: https://github.com/SpEcHiDe/AnyDLBot
+© @AnyDLBot"""
     RENAME_403_ERR = "Sorry. You are not permitted to rename this file."
     ABS_TEXT = " Please don't be selfish."
-    UPGRADE_TEXT = "@AnyDLBot <a href='https://t.me/SpEcHlDe/599'>Paid Plans</a>\nMake your payment and send screenshot to @shrimadhabot OR @SpEcHIDe"
+    # UPGRADE_TEXT = "no one gonna help you 🤣🤣🤣🤣"
+    UPGRADE_TEXT = """@AnyDL_Bot Paid Plans
+-------
+Plan: FREE
+Filesize limit: 0 MB
+Daily limit: UNLIMITED
+Price 🇮🇳: ₹ 0/Month
+FEATURES:
+👉 <a href="https://t.me/SpEcHlDe/608">All Supported Video Formats of https://rg3.github.io/youtube-dl/supportedsites.html, except HLS videos!</a>
+👉 <a href="https://t.me/SpEcHlDe/611">Get High Speed Direct Download Link of any Telegram file</a>
+👉 <a href="https://t.me/SpEcHlDe/660">Get a Telegram sticker as a Telegram downloadable media</a>
+-------
+Plan: A
+Filesize limit: UNLIMITED
+Daily limit: UNLIMITED
+Price 🇮🇳: ₹ 97/Month
+<a href="https://p-y.tm/Y-NCRdB">Pay Via PayTM</a>
+FEATURES:
+👉 <a href="https://t.me/SpEcHlDe/608">All Supported Video Formats of https://rg3.github.io/youtube-dl/supportedsites.html, except HLS videos!</a>
+👉 <a href="https://t.me/SpEcHlDe/611">Get High Speed Direct Download Link of any Telegram file</a>
+👉 <a href="https://t.me/SpEcHlDe/660">Get a Telegram sticker as a Telegram downloadable media</a>
+👉 <a href="https://t.me/SpEcHlDe/609">Upload as file from any HTTP link, with custom thumbnail support</a>
+-------
+Plan: B
+Filesize limit: 1.5GB
+Daily limit: UNLIMITED
+Price 🇮🇳: ₹ 127/Month
+<a href="https://p-y.tm/i-h6RdB">Pay Via PayTM</a>
+FEATURES:
+👉 <a href="https://t.me/SpEcHlDe/608">All Supported Video Formats of https://rg3.github.io/youtube-dl/supportedsites.html!</a>
+👉 <a href="https://t.me/SpEcHlDe/611">Get High Speed Direct Download Link of any Telegram file</a>
+👉 <a href="https://t.me/SpEcHlDe/660">Get a Telegram sticker as a Telegram downloadable media</a>
+👉 <a href="https://t.me/SpEcHlDe/609">Upload as file from any HTTP link, with custom thumbnail support</a>
+👉 <a href="https://telegram.dog/AnyDLBot">Convert To Streamable Video, any Telegram file</a>
+👉 <a href="https://telegram.dog/AnyDLBot">Convert To Telegram Audio, the media sent as Telegram Documents</a>
+-------
+Plan: C
+Filesize limit: 1.5GB
+Daily limit: UNLIMITED
+Price 🇮🇳: ₹ 314/Month
+<a href="https://p-y.tm/ub-p4Um">Pay Via PayTM</a>
+FEATURES:
+👉 <a href="https://t.me/SpEcHlDe/608">All Supported Video Formats of https://rg3.github.io/youtube-dl/supportedsites.html!</a>
+👉 <a href="https://t.me/SpEcHlDe/611">Get High Speed Direct Download Link of any Telegram file</a>
+👉 <a href="https://t.me/SpEcHlDe/660">Get a Telegram sticker as a Telegram downloadable media</a>
+👉 <a href="https://t.me/SpEcHlDe/609">Upload as file from any HTTP link, with custom thumbnail support</a>
+👉 <a href="https://telegram.dog/AnyDLBot">Convert To Streamable Video, any Telegram file</a>
+👉 <a href="https://telegram.dog/AnyDLBot">Convert To Telegram Audio, the media sent as Telegram Documents</a>
+👉 <a href="https://t.me/SpEcHlDe/610">ReName Telegram files, with custom thumbnail support</a>
+-------
+Plan: D
+Filesize limit: 1.5GB
+Daily limit: UNLIMITED
+Price 🇮🇳: ₹ 987/Month
+<a href="https://p-y.tm/WOF-alE">Pay Via PayTM</a>
+FEATURES:
+👉 <a href="https://t.me/SpEcHlDe/608">All Supported Video Formats of https://rg3.github.io/youtube-dl/supportedsites.html!</a>
+👉 <a href="https://t.me/SpEcHlDe/611">Get High Speed Direct Download Link of any Telegram file</a>
+👉 <a href="https://t.me/SpEcHlDe/660">Get a Telegram sticker as a Telegram downloadable media</a>
+👉 <a href="https://t.me/SpEcHlDe/625">Generate Custom Thumbnail by sending two photos in a Media Album</a>
+👉 <a href="https://t.me/SpEcHlDe/609">Upload as file from any HTTP link, with custom thumbnail support</a>
+👉 <a href="https://telegram.dog/AnyDLBot">Convert To Streamable Video, any Telegram file</a>
+👉 <a href="https://telegram.dog/AnyDLBot">Convert To Telegram Audio, the media sent as Telegram Documents</a>
+👉 <a href="https://t.me/SpEcHlDe/610">ReName Telegram files, with custom thumbnail support</a>
+👉 <a href="https://t.me/SpEcHlDe/653">Trim large videos</a>, and <a href="https://t.me/SpEcHlDe/652">Take Screenshots</a> of Telegram media files.
+👉 <a href="https://t.me/SpEcHlDe/657">Extract compressed Telegram media</a>
+👉 PLUS, all newly features that are going to be added in the feature*.
+-------
+NOTE: After payment you must take screenshot of receipt and send to anyone of the admins
+@SpEcHlDe, or @ShriMADhaBot"""
     FORMAT_SELECTION = "Select the desired format: <a href='{}'>file size might be approximate</a> \nIf you want to set custom thumbnail, send photo before or quickly after tapping on any of the below buttons."
+    SET_CUSTOM_USERNAME_PASSWORD = """If you want to download premium videos, provide in the following format:
+URL | filename | username | password"""
     NOYES_URL = "@GetPublicLinkBot URL detected. Please do not abuse the service!"
     DOWNLOAD_START = "trying to download"
     UPLOAD_START = "trying to upload"
     RCHD_BOT_API_LIMIT = "size greater than maximum allowed size (50MB). Neverthless, trying to upload."
-    RCHD_TG_API_LIMIT = "Sorry. But, I cannot upload files greater than 1.5GB due to Telegram API limitations."
+    RCHD_TG_API_LIMIT = "Downloaded in {} seconds.\nDetected File Size: {}\nSorry. But, I cannot upload files greater than 1.5GB due to Telegram API limitations."
     AFTER_SUCCESSFUL_UPLOAD_MSG = "Please rate me if you find me useful. https://t.me/tlgrmcbot?start=anydl_bot-bot"
+    AFTER_SUCCESSFUL_UPLOAD_MSG_WITH_TS = "Downloaded in {} seconds. \nPlease rate me if you find me useful. https://t.me/tlgrmcbot?start=anydl_bot-bot \nUploaded in {} seconds."
     NOT_AUTH_USER_TEXT = "Please /upgrade your subscription."
     NOT_AUTH_USER_TEXT_FILE_SIZE = "Detected File Size: {}. Free Users can only upload: {}\nPlease /upgrade your subscription.\nIf you think this is a bug, please contact <a href='https://telegram.dog/ShrimadhaVahdamirhS'>@SpEcHlDe</a>"
     SAVED_CUSTOM_THUMB_NAIL = "Custom video / file thumbnail saved. This image will be used in the video / file."
@@ -18,7 +93,7 @@ class Translation(object):
     SAVED_RECVD_DOC_FILE = "Document Downloaded Successfully."
     CUSTOM_CAPTION_UL_FILE = " "
     NO_CUSTOM_THUMB_NAIL_FOUND = "No Custom ThumbNail found."
-    NO_VOID_FORMAT_FOUND = "Can you check the url? I am unable to detect video format from URL. If you think this could be a bug please report on https://github.com/spechide/AnyDLBot/issues"
+    NO_VOID_FORMAT_FOUND = "something is wrong with the URL you gave me 🤦‍♀️. If you think this could be a bug please report on https://github.com/spechide/AnyDLBot/issues OR https://telegram.dog/ShrimadhaVahdamirhS\n<b>YouTubeDL</b> said: {}"
     USER_ADDED_TO_DB = "User <a href='tg://user?id={}'>{}</a> added to {} till {}."
     CURENT_PLAN_DETAILS = """Current plan details
 --------
@@ -26,11 +101,16 @@ Telegram ID: <code>{}</code>
 Plan name: <a href='https://t.me/SpEcHlDe/599'>{}</a>
 Expires on: {}"""
     HELP_USER = """There are multiple things I can do:
-👉 All Supported Video Formats of https://rg3.github.io/youtube-dl/supportedsites.html
-👉 Upload as file from any HTTP link
-👉 Convert To Streamable Video, any Telegram media
-👉 ReName Telegram files, with custom thumbnail support
-👉 Get High Speed Direct Download Link of any Telegram file
+👉 <a href="https://t.me/SpEcHlDe/608">All Supported Video Formats of https://rg3.github.io/youtube-dl/supportedsites.html, with custom file name and custom thumbnail support</a>
+👉 <a href="https://t.me/SpEcHlDe/609">Upload as file from any HTTP link, with custom thumbnail support</a>
+👉 <a href="https://telegram.dog/AnyDLBot">Convert To Streamable Video, any Telegram file</a>
+👉 <a href="https://telegram.dog/AnyDLBot">Convert To Telegram Audio, the media sent as Telegram Documents</a>
+👉 <a href="https://t.me/SpEcHlDe/610">ReName Telegram files, with custom thumbnail support</a>
+👉 <a href="https://t.me/SpEcHlDe/611">Get High Speed Direct Download Link of any Telegram file</a>
+👉 <a href="https://t.me/SpEcHlDe/625">Generate Custom Thumbnail by sending two photos in a Media Album</a>
+👉 <a href="https://t.me/SpEcHlDe/653">Trim large videos</a>, and <a href="https://t.me/SpEcHlDe/652">Take Screenshots</a> of Telegram media files.
+👉 <a href="https://t.me/SpEcHlDe/657">Extract compressed Telegram media</a>
+👉 <a href="https://t.me/SpEcHlDe/660">Get a Telegram sticker as a Telegram downloadable media</a>
 --------
 Send /me to know current plan details"""
     REPLY_TO_DOC_GET_LINK = "Reply to a Telegram media to get High Speed Direct Download Link"
@@ -46,5 +126,20 @@ Send /me to know current plan details"""
     REPLY_TO_MEDIA_ALBUM_TO_GEN_THUMB = "Reply /generatecustomthumbnail to a media album, to generate custom thumbail"
     ERR_ONLY_TWO_MEDIA_IN_ALBUM = "Media Album should contain only two photos. Please re-send the media album, and then try again, or send only two photos in an album."
     INVALID_UPLOAD_BOT_URL_FORMAT = "URL format is incorrect. make sure your url starts with either http:// or https://. You can set custom file name using the format link | file_name.extension"
-    ABUSIVE_USERS = "You are not allowed to use this bot. If you think this is a mistake, please contact <a href='https://telegram.dog/ShrimadhaVahdamirhS'>@SpEcHlDe</a> to remove this restriction."
+    ABUSIVE_USERS = "You are not allowed to use this bot. If you think this is a mistake, please check /me to remove this restriction."
     FF_MPEG_RO_BOT_AD_VER_TISE_MENT = "https://telegram.dog/FFMpegRoBot"
+    EXTRACT_ZIP_INTRO_ONE = "Send a compressed file first, Then reply /unzip command to the file."
+    EXTRACT_ZIP_INTRO_THREE = "Analyzing received file. ⚠️ This might take some time. Please be patient. "
+    UNZIP_SUPPORTED_EXTENSIONS = ("zip", "rar")
+    EXTRACT_ZIP_ERRS_OCCURED = "Sorry. Errors occurred while processing compressed file. Please check everything again twice, and if the issue persists, report this to <a href='https://telegram.dog/ShrimadhaVahdamirhS'>@SpEcHlDe</a>"
+    EXTRACT_ZIP_STEP_TWO = """Select file_name to upload from the below options.
+You can use /rename command after receiving file to rename it with custom thumbnail support."""
+    CANCEL_STR = "Process Cancelled"
+    ZIP_UPLOADED_STR = "Uploaded {} files in {} seconds"
+    FREE_USER_LIMIT_Q_SZE = """Cannot Process.
+Free users only 1 request per hour.
+/upgrade or Try 3600 seconds later."""
+    G_DRIVE_GIVE_URL_TO_LOGIN = "Please login using {}. Send `/gsetup <YOUR CODE>`"
+    G_DRIVE_SETUP_IN_VALID_FORMAT = "Send `/gsetup <YOUR CODE>`"
+    G_DRIVE_SETUP_COMPLETE = "Logged In."
+    SLOW_URL_DECED = "Gosh that seems to be a very slow URL. Since you were screwing my home, I am in no mood to download this file. Meanwhile, why don't you try this:==> https://shrtz.me/PtsVnf6 and get me a fast URL so that I can upload to Telegram, without me slowing down for other users. "

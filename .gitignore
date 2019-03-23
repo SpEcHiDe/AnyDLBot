@@ -215,3 +215,6 @@ config.py
 *.session
 *.session*
 *.DB
+
+credential.json
+client_secrets.json
