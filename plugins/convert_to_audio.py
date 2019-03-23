@@ -50,11 +50,12 @@ def convert_to_audio(bot, update):
             text=Translation.DOWNLOAD_START,
             reply_to_message_id=update.message_id
         )
+        c_time = time.time()
         the_real_download_location = bot.download_media(
             message=update.reply_to_message,
             file_name=download_location,
             progress=progress_for_pyrogram,
-            progress_args=(Translation.DOWNLOAD_START, a.message_id, update.chat.id)
+            progress_args=(Translation.DOWNLOAD_START, a.message_id, update.chat.id, c_time)
         )
         if the_real_download_location is not None:
             bot.edit_message_text(
@@ -95,10 +96,12 @@ def convert_to_audio(bot, update):
                 Image.open(thumb_image_path).convert("RGB").save(thumb_image_path)
                 img = Image.open(thumb_image_path)
                 # https://stackoverflow.com/a/37631799/4723940
-                img.thumbnail((90, 90))
+                # img.thumbnail((90, 90))
+                img.resize((90, height))
                 img.save(thumb_image_path, "JPEG")
                 # https://pillow.readthedocs.io/en/3.1.x/reference/Image.html#create-thumbnails
             # try to upload file
+            c_time = time.time()
             bot.send_audio(
                 chat_id=update.chat.id,
                 audio=audio_file_location_path,
@@ -110,7 +113,7 @@ def convert_to_audio(bot, update):
                 thumb=thumb_image_path,
                 reply_to_message_id=update.reply_to_message.message_id,
                 progress=progress_for_pyrogram,
-                progress_args=(Translation.UPLOAD_START, a.message_id, update.chat.id)
+                progress_args=(Translation.UPLOAD_START, a.message_id, update.chat.id, c_time)
             )
             try:
                 os.remove(thumb_image_path)

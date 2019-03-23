@@ -1,17 +1,10 @@
 ## [AnyDLBot](https://telegram.dog/AnyDLBot)
----
 
 **There are multiple things I can do**:
 
-👉 All Supported Video Formats of https://rg3.github.io/youtube-dl/supportedsites.html
+**FEATURES**:  
+![​](https://telegra.ph/file/755f6b314bfa9702d4139.jpg)
 
-👉 Upload as file from any HTTP link
-
-👉 Convert To Streamable Video, any Telegram media
-
-👉 ReName Telegram files, with custom thumbnail support
-
-👉 Get High Speed Direct Download Link of any Telegram file
 
 ### Installation
 
@@ -20,8 +13,6 @@
 **upgrade** your subscription for [@AnyDL_Bot](https://telegram.dog/AnyDl_Bot) without having to run anything on your own
 
 #### The Easy Way
-
-[![](http://ouo.io/images/banners/r1.jpg "ouo.io - Make short links and earn the biggest money")](http://ouo.io/ref/ROXeyb0X)
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 

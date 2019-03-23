@@ -9,6 +9,7 @@ logging.basicConfig(level=logging.DEBUG,
 logger = logging.getLogger(__name__)
 
 import os
+import time
 
 # the secret configuration specific things
 if bool(os.environ.get("WEBHOOK", False)):
@@ -50,11 +51,12 @@ def rename_doc(bot, update):
             text=Translation.DOWNLOAD_START,
             reply_to_message_id=update.message_id
         )
+        c_time = time.time()
         the_real_download_location = bot.download_media(
             message=update.reply_to_message,
             file_name=download_location,
             progress=progress_for_pyrogram,
-            progress_args=(Translation.DOWNLOAD_START, a.message_id, update.chat.id)
+            progress_args=(Translation.DOWNLOAD_START, a.message_id, update.chat.id, c_time)
         )
         if the_real_download_location is not None:
             bot.edit_message_text(
@@ -94,9 +96,11 @@ def rename_doc(bot, update):
                 Image.open(thumb_image_path).convert("RGB").save(thumb_image_path)
                 img = Image.open(thumb_image_path)
                 # https://stackoverflow.com/a/37631799/4723940
-                img.thumbnail((90, 90))
+                # img.thumbnail((90, 90))
+                img.resize((90, height))
                 img.save(thumb_image_path, "JPEG")
                 # https://pillow.readthedocs.io/en/3.1.x/reference/Image.html#create-thumbnails
+            c_time = time.time()
             bot.send_document(
                 chat_id=update.chat.id,
                 document=new_file_name,
@@ -105,10 +109,10 @@ def rename_doc(bot, update):
                 # reply_markup=reply_markup,
                 reply_to_message_id=update.reply_to_message.message_id,
                 progress=progress_for_pyrogram,
-                progress_args=(Translation.UPLOAD_START, a.message_id, update.chat.id)
+                progress_args=(Translation.UPLOAD_START, a.message_id, update.chat.id, c_time)
             )
             try:
-                os.remove(the_real_download_location)
+                os.remove(new_file_name)
                 os.remove(thumb_image_path)
             except:
                 pass

@@ -142,7 +142,7 @@ def delete_thumbnail(bot, update):
     download_location = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id)
     try:
         os.remove(download_location + ".jpg")
-        os.remove(download_location + ".json")
+        # os.remove(download_location + ".json")
     except:
         pass
     bot.send_message(
