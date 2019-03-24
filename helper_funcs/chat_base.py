@@ -4,25 +4,28 @@
 
 # the logging things
 import logging
+import os
+import config
+# the Telegram trackings
+from chatbase import Message
+from pyrogram import Client, Filters
+
+# the Strings used for this "thing"
+from translation import Translation
+
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-import os
 
 # the secret configuration specific things
 if bool(os.environ.get("WEBHOOK", False)):
     from sample_config import Config
 else:
-    from config import Config
+    from sample_config import Config
 
-# the Strings used for this "thing"
-from translation import Translation
 
-from pyrogram import Client, Filters
 
-# the Telegram trackings
-from chatbase import Message
 
 
 def TRChatBase(chat_id, message_text, intent):

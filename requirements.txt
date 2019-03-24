@@ -5,3 +5,4 @@ pyrogram[fast]
 Pillow
 hachoir
 PyDrive
+pyrogram
