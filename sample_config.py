@@ -5,10 +5,6 @@ class Config(object):
     CHAT_BASE_TOKEN = os.environ.get("CHAT_BASE_TOKEN", "")
     # get a token from @BotFather
     TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN", "")
-    # your domain to show when download file is greater than MAX_FILE_SIZE
-    HTTP_DOMAIN = os.environ.get("HTTP_DOMAIN", "https://example.com/")
-    # for running on Heroku.com
-    PORT = int(os.environ.get('PORT', 5000))
     # The Telegram API things
     APP_ID = int(os.environ.get("APP_ID", 12345))
     API_HASH = os.environ.get("API_HASH")
