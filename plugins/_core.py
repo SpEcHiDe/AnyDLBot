@@ -397,6 +397,7 @@ def button(bot, update):
                 thumb_image_path = None
             # try to upload file
             if tg_send_type == "audio":
+                starts = time.time()
                 bot.send_audio(
                     chat_id=update.message.chat.id,
                     audio=download_directory,
@@ -409,9 +410,10 @@ def button(bot, update):
                     reply_to_message_id=update.message.reply_to_message.message_id,
                     progress=progress_for_pyrogram,
                     progress_args=(
-                        Translation.UPLOAD_START, update.message.message_id, update.message.chat.id)
+                        Translation.UPLOAD_START, update.message.message_id, update.message.chat.id, starts)
                 )
             elif tg_send_type == "file":
+                starts = time.time()
                 bot.send_document(
                     chat_id=update.message.chat.id,
                     document=download_directory,
@@ -421,9 +423,10 @@ def button(bot, update):
                     reply_to_message_id=update.message.reply_to_message.message_id,
                     progress=progress_for_pyrogram,
                     progress_args=(
-                        Translation.UPLOAD_START, update.message.message_id, update.message.chat.id)
+                        Translation.UPLOAD_START, update.message.message_id, update.message.chat.id, starts)
                 )
             elif tg_send_type == "vm":
+                starts = time.time()
                 bot.send_video_note(
                     chat_id=update.message.chat.id,
                     video_note=download_directory,
@@ -433,9 +436,10 @@ def button(bot, update):
                     reply_to_message_id=update.message.reply_to_message.message_id,
                     progress=progress_for_pyrogram,
                     progress_args=(
-                        Translation.UPLOAD_START, update.message.message_id, update.message.chat.id)
+                        Translation.UPLOAD_START, update.message.message_id, update.message.chat.id, starts)
                 )
             elif tg_send_type == "video":
+                starts = time.time()
                 bot.send_video(
                     chat_id=update.message.chat.id,
                     video=download_directory,
@@ -449,7 +453,7 @@ def button(bot, update):
                     reply_to_message_id=update.message.reply_to_message.message_id,
                     progress=progress_for_pyrogram,
                     progress_args=(
-                        Translation.UPLOAD_START, update.message.message_id, update.message.chat.id)
+                        Translation.UPLOAD_START, update.message.message_id, update.message.chat.i, startsd)
                 )
             else:
                 logger.info("Did this happen? :\\")
