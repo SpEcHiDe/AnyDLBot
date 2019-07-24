@@ -32,9 +32,9 @@ from hachoir.parser import createParser
 
 
 @pyrogram.Client.on_message(pyrogram.Filters.command(["ffmpegrobot"]))
-def ffmpegrobot_ad(bot, update):
+async def ffmpegrobot_ad(bot, update):
     TRChatBase(update.from_user.id, update.text, "ffmpegrobot")
-    bot.send_message(
+    await bot.send_message(
         chat_id=update.chat.id,
         text=Translation.FF_MPEG_RO_BOT_AD_VER_TISE_MENT,
         disable_web_page_preview=True,
@@ -43,10 +43,10 @@ def ffmpegrobot_ad(bot, update):
 
 
 @pyrogram.Client.on_message(pyrogram.Filters.command(["trim"]))
-def trim(bot, update):
+async def trim(bot, update):
     TRChatBase(update.from_user.id, update.text, "trim")
     if str(update.from_user.id) not in Config.SUPER7X_DLBOT_USERS:
-        bot.send_message(
+        await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.NOT_AUTH_USER_TEXT,
             reply_to_message_id=update.message_id
@@ -54,7 +54,7 @@ def trim(bot, update):
         return
     saved_file_path = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".FFMpegRoBot.mkv"
     if os.path.exists(saved_file_path):
-        a = bot.send_message(
+        a = await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.DOWNLOAD_START,
             reply_to_message_id=update.message_id
@@ -63,16 +63,16 @@ def trim(bot, update):
         if len(commands) == 3:
             # output should be video
             cmd, start_time, end_time = commands
-            o = cult_small_video(saved_file_path, Config.DOWNLOAD_LOCATION, start_time, end_time)
+            o = await cult_small_video(saved_file_path, Config.DOWNLOAD_LOCATION, start_time, end_time)
             logger.info(o)
             if o is not None:
-                bot.edit_message_text(
+                await bot.edit_message_text(
                     chat_id=update.chat.id,
                     text=Translation.UPLOAD_START,
                     message_id=a.message_id
                 )
                 c_time = time.time()
-                bot.send_video(
+                await bot.send_video(
                     chat_id=update.chat.id,
                     video=o,
                     # caption=description,
@@ -89,7 +89,7 @@ def trim(bot, update):
                     )
                 )
                 os.remove(o)
-                bot.edit_message_text(
+                await bot.edit_message_text(
                     chat_id=update.chat.id,
                     text=Translation.AFTER_SUCCESSFUL_UPLOAD_MSG,
                     disable_web_page_preview=True,
@@ -98,16 +98,16 @@ def trim(bot, update):
         elif len(commands) == 2:
             # output should be screenshot
             cmd, start_time = commands
-            o = take_screen_shot(saved_file_path, Config.DOWNLOAD_LOCATION, start_time)
+            o = await take_screen_shot(saved_file_path, Config.DOWNLOAD_LOCATION, start_time)
             logger.info(o)
             if o is not None:
-                bot.edit_message_text(
+                await bot.edit_message_text(
                     chat_id=update.chat.id,
                     text=Translation.UPLOAD_START,
                     message_id=a.message_id
                 )
                 c_time = time.time()
-                bot.send_document(
+                await bot.send_document(
                     chat_id=update.chat.id,
                     document=o,
                     # thumb=thumb_image_path,
@@ -120,7 +120,7 @@ def trim(bot, update):
                     )
                 )
                 c_time = time.time()
-                bot.send_photo(
+                await bot.send_photo(
                     chat_id=update.chat.id,
                     photo=o,
                     # caption=Translation.CUSTOM_CAPTION_UL_FILE,
@@ -131,21 +131,21 @@ def trim(bot, update):
                     )
                 )
                 os.remove(o)
-                bot.edit_message_text(
+                await bot.edit_message_text(
                     chat_id=update.chat.id,
                     text=Translation.AFTER_SUCCESSFUL_UPLOAD_MSG,
                     disable_web_page_preview=True,
                     message_id=a.message_id
                 )
         else:
-            bot.edit_message_text(
+            await bot.edit_message_text(
                 chat_id=update.chat.id,
                 text=Translation.FF_MPEG_RO_BOT_RE_SURRECT_ED,
                 message_id=a.message_id
             )
     else:
         # reply help message
-        bot.send_message(
+        await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.FF_MPEG_RO_BOT_STEP_TWO_TO_ONE,
             reply_to_message_id=update.message_id
@@ -153,10 +153,10 @@ def trim(bot, update):
 
 
 @pyrogram.Client.on_message(pyrogram.Filters.command(["storageinfo"]))
-def storage_info(bot, update):
+async def storage_info(bot, update):
     TRChatBase(update.from_user.id, update.text, "storageinfo")
     if str(update.from_user.id) not in Config.SUPER7X_DLBOT_USERS:
-        bot.send_message(
+        await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.NOT_AUTH_USER_TEXT,
             reply_to_message_id=update.message_id
@@ -168,14 +168,14 @@ def storage_info(bot, update):
         duration = None
         if metadata.has("duration"):
             duration = metadata.get('duration')
-        bot.send_message(
+        await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.FF_MPEG_RO_BOT_STOR_AGE_INFO.format(duration),
             reply_to_message_id=update.message_id
         )
     else:
         # reply help message
-        bot.send_message(
+        await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.FF_MPEG_RO_BOT_STEP_TWO_TO_ONE,
             reply_to_message_id=update.message_id
@@ -183,10 +183,10 @@ def storage_info(bot, update):
 
 
 @pyrogram.Client.on_message(pyrogram.Filters.command(["clearffmpegmedia"]))
-def clear_media(bot, update):
+async def clear_media(bot, update):
     TRChatBase(update.from_user.id, update.text, "clearffmpegmedia")
     if str(update.from_user.id) not in Config.SUPER7X_DLBOT_USERS:
-        bot.send_message(
+        await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.NOT_AUTH_USER_TEXT,
             reply_to_message_id=update.message_id
@@ -195,7 +195,7 @@ def clear_media(bot, update):
     saved_file_path = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".FFMpegRoBot.mkv"
     if os.path.exists(saved_file_path):
         os.remove(saved_file_path)
-    bot.send_message(
+    await bot.send_message(
         chat_id=update.chat.id,
         text=Translation.FF_MPEG_DEL_ETED_CUSTOM_MEDIA,
         reply_to_message_id=update.message_id
@@ -203,10 +203,10 @@ def clear_media(bot, update):
 
 
 @pyrogram.Client.on_message(pyrogram.Filters.command(["downloadmedia"]))
-def download_media(bot, update):
+async def download_media(bot, update):
     TRChatBase(update.from_user.id, update.text, "downloadmedia")
     if str(update.from_user.id) not in Config.SUPER7X_DLBOT_USERS:
-        bot.send_message(
+        await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.NOT_AUTH_USER_TEXT,
             reply_to_message_id=update.message_id
@@ -214,33 +214,35 @@ def download_media(bot, update):
         return
     saved_file_path = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".FFMpegRoBot.mkv"
     if not os.path.exists(saved_file_path):
-        a = bot.send_message(
+        a = await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.DOWNLOAD_START,
             reply_to_message_id=update.message_id
         )
         try:
             c_time = time.time()
-            bot.download_media(
+            await bot.download_media(
                 message=update.reply_to_message,
                 file_name=saved_file_path,
                 progress=progress_for_pyrogram,
-                progress_args=(Translation.DOWNLOAD_START, a.message_id, update.chat.id, c_time)
+                progress_args=(
+                    Translation.DOWNLOAD_START, a.message_id, update.chat.id, c_time
+                )
             )
         except (ValueError) as e:
-            bot.edit_message_text(
+            await bot.edit_message_text(
                 chat_id=update.chat.id,
                 text=str(e),
                 message_id=a.message_id
             )
         else:
-            bot.edit_message_text(
+            await bot.edit_message_text(
                 chat_id=update.chat.id,
                 text=Translation.SAVED_RECVD_DOC_FILE,
                 message_id=a.message_id
             )
     else:
-        bot.send_message(
+        await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.FF_MPEG_RO_BOT_STOR_AGE_ALREADY_EXISTS,
             reply_to_message_id=update.message_id

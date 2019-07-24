@@ -8,11 +8,10 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+import asyncio
 import json
 import math
 import os
-import requests
-import subprocess
 import time
 
 # the secret configuration specific things
@@ -33,22 +32,37 @@ from helper_funcs.help_uploadbot import DownLoadFile
 
 
 @pyrogram.Client.on_message(pyrogram.Filters.regex(pattern=".*http.*"))
-def echo(bot, update):
+async def echo(bot, update):
     # logger.info(update)
     TRChatBase(update.from_user.id, update.text, "/echo")
-    # bot.send_chat_action(
+    # await bot.send_chat_action(
     #     chat_id=update.chat.id,
     #     action="typing"
     # )
     if str(update.from_user.id) in Config.BANNED_USERS:
-        bot.send_message(
-            chat_id=update.chat.id,
+        await bot.edit_message_text(
+            chat_id=update.message.chat.id,
             text=Translation.ABUSIVE_USERS,
-            reply_to_message_id=update.message_id,
+            message_id=update.message.message_id,
             disable_web_page_preview=True,
-            parse_mode=pyrogram.ParseMode.HTML
+            parse_mode="html"
         )
         return
+    if str(update.from_user.id) not in Config.UTUBE_BOT_USERS:
+        # restrict free users from sending more links
+        if str(update.from_user.id) in Config.ADL_BOT_RQ:
+            current_time = time.time()
+            previous_time = Config.ADL_BOT_RQ[str(update.from_user.id)]
+            Config.ADL_BOT_RQ[str(update.from_user.id)] = time.time()
+            if round(current_time - previous_time) < Config.PROCESS_MAX_TIMEOUT:
+                await bot.send_message(
+                    chat_id=update.chat.id,
+                    text=Translation.FREE_USER_LIMIT_Q_SZE,
+                    reply_to_message_id=update.message_id
+                )
+                return
+        else:
+            Config.ADL_BOT_RQ[str(update.from_user.id)] = time.time()
     logger.info(update.from_user)
     url = update.text
     youtube_dl_username = None
@@ -91,49 +105,59 @@ def echo(bot, update):
                 o = entity.offset
                 l = entity.length
                 url = url[o:o + l]
-    try:
-        if ("hotstar.com" in url) and (Config.HTTP_PROXY != ""):
-            command_to_exec = [
-                "youtube-dl",
-                "--no-warnings",
-                "--youtube-skip-dash-manifest",
-                "-j",
-                url,
-                "--proxy", Config.HTTP_PROXY
-            ]
-        else:
-            command_to_exec = [
-                "youtube-dl",
-                "--no-warnings",
-                "--youtube-skip-dash-manifest",
-                "-j",
-                url
-            ]
-        if youtube_dl_username is not None:
-            command_to_exec.append("--username")
-            command_to_exec.append(youtube_dl_username)
-        if youtube_dl_password is not None:
-            command_to_exec.append("--password")
-            command_to_exec.append(youtube_dl_password)
-        logger.info(command_to_exec)
-        t_response = subprocess.check_output(
-            command_to_exec, stderr=subprocess.STDOUT)
-        # https://github.com/rg3/youtube-dl/issues/2630#issuecomment-38635239
-    except subprocess.CalledProcessError as exc:
+    if ("hotstar.com" in url) and (Config.HTTP_PROXY != ""):
+        command_to_exec = [
+            "youtube-dl",
+            "--no-warnings",
+            "--youtube-skip-dash-manifest",
+            "-j",
+            url,
+            "--proxy", Config.HTTP_PROXY
+        ]
+    else:
+        command_to_exec = [
+            "youtube-dl",
+            "--no-warnings",
+            "--youtube-skip-dash-manifest",
+            "-j",
+            url
+        ]
+    if youtube_dl_username is not None:
+        command_to_exec.append("--username")
+        command_to_exec.append(youtube_dl_username)
+    if youtube_dl_password is not None:
+        command_to_exec.append("--password")
+        command_to_exec.append(youtube_dl_password)
+    # logger.info(command_to_exec)
+    process = await asyncio.create_subprocess_exec(
+        *command_to_exec,
+        # stdout must a pipe to be accessible as process.stdout
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    # Wait for the subprocess to finish
+    stdout, stderr = await process.communicate()
+    e_response = stderr.decode().strip()
+    # logger.info(e_response)
+    t_response = stdout.decode().strip()
+    # logger.info(t_response)
+    # https://github.com/rg3/youtube-dl/issues/2630#issuecomment-38635239
+    if e_response and "nonnumeric port" not in e_response:
         # logger.warn("Status : FAIL", exc.returncode, exc.output)
-        error_message = exc.output.decode("UTF-8").replace("please report this issue on https://yt-dl.org/bug . Make sure you are using the latest version; see  https://yt-dl.org/update  on how to update. Be sure to call youtube-dl with the --verbose flag and include its complete output.", "")
+        error_message = e_response.replace("please report this issue on https://yt-dl.org/bug . Make sure you are using the latest version; see  https://yt-dl.org/update  on how to update. Be sure to call youtube-dl with the --verbose flag and include its complete output.", "")
         if "This video is only available for registered users." in error_message:
             error_message += Translation.SET_CUSTOM_USERNAME_PASSWORD
-        bot.send_message(
+        await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.NO_VOID_FORMAT_FOUND.format(str(error_message)),
             reply_to_message_id=update.message_id,
-            parse_mode=pyrogram.ParseMode.HTML,
+            parse_mode="html",
             disable_web_page_preview=True
         )
-    else:
+        return False
+    if t_response:
         # logger.info(t_response)
-        x_reponse = t_response.decode("UTF-8").strip()
+        x_reponse = t_response
         if "\n" in x_reponse:
             x_reponse, _ = x_reponse.split("\n")
         response_json = json.loads(x_reponse)
@@ -163,18 +187,15 @@ def echo(bot, update):
                 if format_string is not None and not "audio only" in format_string:
                     ikeyboard = [
                         pyrogram.InlineKeyboardButton(
-                            "S" + format_ext  + "Video [" + format_string +
-                            "] ( " +
-                            approx_file_size + " )",
+                            "S " + format_string + " video " + approx_file_size + " ",
                             callback_data=(cb_string_video).encode("UTF-8")
                         ),
                         pyrogram.InlineKeyboardButton(
-                           "D" + format_ext  + "File [" + format_string +
-                           "]",
-                           callback_data=(cb_string_file).encode("UTF-8")
+                            "D " + format_ext + " " + approx_file_size + " ",
+                            callback_data=(cb_string_file).encode("UTF-8")
                         )
                     ]
-                    if duration is not None:
+                    """if duration is not None:
                         cb_string_video_message = "{}|{}|{}".format(
                             "vm", format_id, format_ext)
                         ikeyboard.append(
@@ -183,7 +204,7 @@ def echo(bot, update):
                                 callback_data=(
                                     cb_string_video_message).encode("UTF-8")
                             )
-                        )
+                        )"""
                 else:
                     # special weird case :\
                     ikeyboard = [
@@ -232,6 +253,20 @@ def echo(bot, update):
                     callback_data=(cb_string_file).encode("UTF-8")
                 )
             ])
+            cb_string_file = "{}={}={}".format(
+                "file", format_id, format_ext)
+            cb_string_video = "{}={}={}".format(
+                "video", format_id, format_ext)
+            inline_keyboard.append([
+                pyrogram.InlineKeyboardButton(
+                    "video",
+                    callback_data=(cb_string_video).encode("UTF-8")
+                ),
+                pyrogram.InlineKeyboardButton(
+                    "file",
+                    callback_data=(cb_string_file).encode("UTF-8")
+                )
+            ])
         reply_markup = pyrogram.InlineKeyboardMarkup(inline_keyboard)
         # logger.info(reply_markup)
         thumbnail = Config.DEF_THUMB_NAIL_VID_S
@@ -250,10 +285,35 @@ def echo(bot, update):
             update.message_id,
             update.chat.id
         )
-        bot.send_message(
+        await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.FORMAT_SELECTION.format(thumbnail) + "\n" + Translation.SET_CUSTOM_USERNAME_PASSWORD,
             reply_markup=reply_markup,
-            parse_mode=pyrogram.ParseMode.HTML,
+            parse_mode="html",
+            reply_to_message_id=update.message_id
+        )
+    else:
+        # fallback for nonnumeric port a.k.a seedbox.io
+        inline_keyboard = []
+        cb_string_file = "{}={}={}".format(
+            "file", "LFO", "NONE")
+        cb_string_video = "{}={}={}".format(
+            "video", "OFL", "ENON")
+        inline_keyboard.append([
+            pyrogram.InlineKeyboardButton(
+                "SVideo",
+                callback_data=(cb_string_video).encode("UTF-8")
+            ),
+            pyrogram.InlineKeyboardButton(
+                "DFile",
+                callback_data=(cb_string_file).encode("UTF-8")
+            )
+        ])
+        reply_markup = pyrogram.InlineKeyboardMarkup(inline_keyboard)
+        await bot.send_message(
+            chat_id=update.chat.id,
+            text=Translation.FORMAT_SELECTION.format(""),
+            reply_markup=reply_markup,
+            parse_mode="html",
             reply_to_message_id=update.message_id
         )

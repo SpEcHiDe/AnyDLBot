@@ -29,10 +29,10 @@ from helper_funcs.chat_base import TRChatBase
 
 
 @pyrogram.Client.on_message(pyrogram.Filters.command(["generatecustomthumbnail"]))
-def generate_custom_thumbnail(bot, update):
+async def generate_custom_thumbnail(bot, update):
     TRChatBase(update.from_user.id, update.text, "generatecustomthumbnail")
     if str(update.from_user.id) not in Config.SUPER7X_DLBOT_USERS:
-        bot.send_message(
+        await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.NOT_AUTH_USER_TEXT,
             reply_to_message_id=update.message_id
@@ -53,14 +53,14 @@ def generate_custom_thumbnail(bot, update):
                 # combine: https://stackoverflow.com/a/30228789/4723940
                 imgs_comb.save(save_final_image)
                 # send
-                bot.send_photo(
+                await bot.send_photo(
                     chat_id=update.chat.id,
                     photo=save_final_image,
                     caption=Translation.CUSTOM_CAPTION_UL_FILE,
                     reply_to_message_id=update.message_id
                 )
             else:
-                bot.send_message(
+                await bot.send_message(
                     chat_id=update.chat.id,
                     text=Translation.ERR_ONLY_TWO_MEDIA_IN_ALBUM,
                     reply_to_message_id=update.message_id
@@ -71,13 +71,13 @@ def generate_custom_thumbnail(bot, update):
             except:
                 pass
         else:
-            bot.send_message(
+            await bot.send_message(
                 chat_id=update.chat.id,
                 text=Translation.REPLY_TO_MEDIA_ALBUM_TO_GEN_THUMB,
                 reply_to_message_id=update.message_id
             )
     else:
-        bot.send_message(
+        await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.REPLY_TO_MEDIA_ALBUM_TO_GEN_THUMB,
             reply_to_message_id=update.message_id
@@ -85,20 +85,20 @@ def generate_custom_thumbnail(bot, update):
 
 
 @pyrogram.Client.on_message(pyrogram.Filters.photo)
-def save_photo(bot, update):
+async def save_photo(bot, update):
     TRChatBase(update.from_user.id, update.text, "save_photo")
     if str(update.from_user.id) in Config.BANNED_USERS:
-        bot.send_message(
+        await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.ABUSIVE_USERS,
             reply_to_message_id=update.message_id,
             disable_web_page_preview=True,
-            parse_mode=pyrogram.ParseMode.HTML
+            parse_mode="html"
         )
         return
     if update.media_group_id is not None:
         if str(update.from_user.id) not in Config.SUPER7X_DLBOT_USERS:
-            bot.send_message(
+            await bot.send_message(
                 chat_id=update.chat.id,
                 text=Translation.NOT_AUTH_USER_TEXT,
                 reply_to_message_id=update.message_id
@@ -109,18 +109,18 @@ def save_photo(bot, update):
         # create download directory, if not exist
         if not os.path.isdir(download_location):
             os.makedirs(download_location)
-        bot.download_media(
+        await bot.download_media(
             message=update,
             file_name=download_location
         )
     else:
         # received single photo
         download_location = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg"
-        bot.download_media(
+        await bot.download_media(
             message=update,
             file_name=download_location
         )
-        bot.send_message(
+        await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.SAVED_CUSTOM_THUMB_NAIL,
             reply_to_message_id=update.message_id
@@ -128,15 +128,15 @@ def save_photo(bot, update):
 
 
 @pyrogram.Client.on_message(pyrogram.Filters.command(["deletethumbnail"]))
-def delete_thumbnail(bot, update):
+async def delete_thumbnail(bot, update):
     TRChatBase(update.from_user.id, update.text, "deletethumbnail")
     if str(update.from_user.id) in Config.BANNED_USERS:
-        bot.send_message(
+        await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.ABUSIVE_USERS,
             reply_to_message_id=update.message_id,
             disable_web_page_preview=True,
-            parse_mode=pyrogram.ParseMode.HTML
+            parse_mode="html"
         )
         return
     download_location = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id)
@@ -145,7 +145,7 @@ def delete_thumbnail(bot, update):
         # os.remove(download_location + ".json")
     except:
         pass
-    bot.send_message(
+    await bot.send_message(
         chat_id=update.chat.id,
         text=Translation.DEL_ETED_CUSTOM_THUMB_NAIL,
         reply_to_message_id=update.message_id

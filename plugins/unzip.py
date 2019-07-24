@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 import os
 import shutil
 import subprocess
+import time
 
 # the secret configuration specific things
 if bool(os.environ.get("WEBHOOK", False)):
@@ -29,10 +30,10 @@ from helper_funcs.display_progress import progress_for_pyrogram, humanbytes
 
 
 @pyrogram.Client.on_message(pyrogram.Filters.command(["unzip"]))
-def unzip(bot, update):
+async def unzip(bot, update):
     TRChatBase(update.from_user.id, update.text, "unzip")
     if str(update.from_user.id) not in Config.SUPER7X_DLBOT_USERS:
-        bot.send_message(
+        await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.NOT_AUTH_USER_TEXT,
             reply_to_message_id=update.message_id
@@ -46,26 +47,27 @@ def unzip(bot, update):
     if ((reply_message is not None) and
         (reply_message.document is not None) and
         (reply_message.document.file_name.endswith(Translation.UNZIP_SUPPORTED_EXTENSIONS))):
-        a = bot.send_message(
+        a = await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.DOWNLOAD_START,
             reply_to_message_id=update.message_id
         )
+        c_time = time.time()
         try:
-            bot.download_media(
+            await bot.download_media(
                 message=reply_message,
                 file_name=saved_file_path,
                 progress=progress_for_pyrogram,
-                progress_args=(Translation.DOWNLOAD_START, a.message_id, update.chat.id)
+                progress_args=(Translation.DOWNLOAD_START, a.message_id, update.chat.id, c_time)
             )
         except (ValueError) as e:
-            bot.edit_message_text(
+            await bot.edit_message_text(
                 chat_id=update.chat.id,
                 text=str(e),
                 message_id=a.message_id
             )
         else:
-            bot.edit_message_text(
+            await bot.edit_message_text(
                 chat_id=update.chat.id,
                 text=Translation.SAVED_RECVD_DOC_FILE,
                 message_id=a.message_id
@@ -74,7 +76,7 @@ def unzip(bot, update):
                 "/" + str(update.from_user.id) + "zipped" + "/"
             if not os.path.isdir(extract_dir_path):
                 os.makedirs(extract_dir_path)
-            bot.edit_message_text(
+            await bot.edit_message_text(
                 chat_id=update.chat.id,
                 text=Translation.EXTRACT_ZIP_INTRO_THREE,
                 message_id=a.message_id
@@ -97,11 +99,11 @@ def unzip(bot, update):
                     shutil.rmtree(extract_dir_path)
                 except:
                     pass
-                bot.edit_message_text(
+                await bot.edit_message_text(
                     chat_id=update.chat.id,
                     text=Translation.EXTRACT_ZIP_ERRS_OCCURED,
                     disable_web_page_preview=True,
-                    parse_mode=pyrogram.ParseMode.HTML,
+                    parse_mode="html",
                     message_id=a.message_id
                 )
             else:
@@ -133,14 +135,14 @@ def unzip(bot, update):
                     )
                 ])
                 reply_markup = pyrogram.InlineKeyboardMarkup(inline_keyboard)
-                bot.edit_message_text(
+                await bot.edit_message_text(
                     chat_id=update.chat.id,
                     text=Translation.EXTRACT_ZIP_STEP_TWO,
                     message_id=a.message_id,
                     reply_markup=reply_markup,
                 )
     else:
-        bot.send_message(
+        await bot.send_message(
             chat_id=update.chat.id,
             text=Translation.EXTRACT_ZIP_INTRO_ONE,
             reply_to_message_id=update.message_id

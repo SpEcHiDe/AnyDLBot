@@ -40,7 +40,9 @@ class Config(object):
     GCS_SE_ID = os.environ.get("GCS_SE_ID", None)
     # dict to hold the ReQuest queue
     ADL_BOT_RQ = {}
+    # maximum message length in Telegram
+    MAX_MESSAGE_LENGTH = 4096
     # set timeout for subprocess
     PROCESS_MAX_TIMEOUT = 3600
-    # dict to hold Google Drive SignIns
-    G_DRIVE_AUTH_DRQ = {}
+    # watermark file
+    DEF_WATER_MARK_FILE = ""

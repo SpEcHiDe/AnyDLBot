@@ -28,46 +28,63 @@ from helper_funcs.display_progress import progress_for_pyrogram
 
 
 @pyrogram.Client.on_message(pyrogram.Filters.sticker)
-def DownloadStickersBot(bot, update):
+async def DownloadStickersBot(bot, update):
     TRChatBase(update.from_user.id, update.text, "DownloadStickersBot")
     if str(update.from_user.id) in Config.BANNED_USERS:
-        bot.edit_message_text(
+        await bot.edit_message_text(
             chat_id=update.message.chat.id,
             text=Translation.ABUSIVE_USERS,
             message_id=update.message.message_id,
             disable_web_page_preview=True,
-            parse_mode=pyrogram.ParseMode.HTML
+            parse_mode="html"
         )
         return
+    if str(update.from_user.id) not in Config.UTUBE_BOT_USERS:
+        # restrict free users from sending more links
+        if str(update.from_user.id) in Config.ADL_BOT_RQ:
+            current_time = time.time()
+            previous_time = Config.ADL_BOT_RQ[str(update.from_user.id)]
+            Config.ADL_BOT_RQ[str(update.from_user.id)] = time.time()
+            if round(current_time - previous_time) < Config.PROCESS_MAX_TIMEOUT:
+                await bot.send_message(
+                    chat_id=update.chat.id,
+                    text=Translation.FREE_USER_LIMIT_Q_SZE,
+                    reply_to_message_id=update.message_id
+                )
+                return
+        else:
+            Config.ADL_BOT_RQ[str(update.from_user.id)] = time.time()
     logger.info(update.from_user)
     download_location = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + "_DownloadStickersBot_" + str(update.from_user.id) + ".png"
-    a = bot.send_message(
+    a = await bot.send_message(
         chat_id=update.chat.id,
         text=Translation.DOWNLOAD_START,
         reply_to_message_id=update.message_id
     )
     try:
         c_time = time.time()
-        the_real_download_location = bot.download_media(
+        the_real_download_location = await bot.download_media(
             message=update,
             file_name=download_location,
             progress=progress_for_pyrogram,
-            progress_args=(Translation.DOWNLOAD_START, a.message_id, update.chat.id, c_time)
+            progress_args=(
+                Translation.DOWNLOAD_START, a.message_id, update.chat.id, c_time
+            )
         )
     except (ValueError) as e:
-        bot.edit_message_text(
+        await bot.edit_message_text(
             text=str(e),
             chat_id=update.chat.id,
             message_id=a.message_id
         )
         return False
-    bot.edit_message_text(
+    await bot.edit_message_text(
         text=Translation.SAVED_RECVD_DOC_FILE,
         chat_id=update.chat.id,
         message_id=a.message_id
     )
     c_time = time.time()
-    bot.send_document(
+    await bot.send_document(
         chat_id=update.chat.id,
         document=the_real_download_location,
         # thumb=thumb_image_path,
@@ -79,7 +96,7 @@ def DownloadStickersBot(bot, update):
             Translation.UPLOAD_START, a.message_id, update.chat.id, c_time
         )
     )
-    bot.send_photo(
+    await bot.send_photo(
         chat_id=update.chat.id,
         photo=the_real_download_location,
         # thumb=thumb_image_path,
@@ -92,7 +109,7 @@ def DownloadStickersBot(bot, update):
         )
     )
     os.remove(the_real_download_location)
-    bot.edit_message_text(
+    await bot.edit_message_text(
         text=Translation.AFTER_SUCCESSFUL_UPLOAD_MSG,
         chat_id=update.chat.id,
         message_id=a.message_id,
