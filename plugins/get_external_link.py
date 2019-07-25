@@ -67,50 +67,36 @@ def get_link(bot, update):
             message_id=a.message_id
         )
         end_one = datetime.now()
-        if str(update.from_user.id) in Config.G_DRIVE_AUTH_DRQ:
-            gauth = Config.G_DRIVE_AUTH_DRQ[str(update.from_user.id)]
-            # Create GoogleDrive instance with authenticated GoogleAuth instance.
-            drive = GoogleDrive(gauth)
-            file_inance = drive.CreateFile()
-            # Read file and set it as a content of this instance.
-            file_inance.SetContentFile(after_download_file_name)
-            file_inance.Upload() # Upload the file.
-            end_two = datetime.now()
-            time_taken_for_upload = (end_two - end_one).seconds
-            logger.info(file_inance)
-            adfulurl = file_inance.webContentLink
-            max_days = 0
-        else:
-            url = "https://transfer.sh/{}.{}".format(str(update.from_user.id), str(download_extension))
-            max_days = "5"
-            command_to_exec = [
-                "curl",
-                # "-H", 'Max-Downloads: 1',
-                "-H", 'Max-Days: 5', # + max_days + '',
-                "--upload-file", after_download_file_name,
-                url
-            ]
+        url = "https://transfer.sh/{}.{}".format(str(update.from_user.id), str(download_extension))
+        max_days = "5"
+        command_to_exec = [
+            "curl",
+            # "-H", 'Max-Downloads: 1',
+            "-H", 'Max-Days: 5', # + max_days + '',
+            "--upload-file", after_download_file_name,
+            url
+        ]
+        bot.edit_message_text(
+            text=Translation.UPLOAD_START,
+            chat_id=update.chat.id,
+            message_id=a.message_id
+        )
+        try:
+            logger.info(command_to_exec)
+            t_response = subprocess.check_output(command_to_exec, stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as exc:
+            logger.info("Status : FAIL", exc.returncode, exc.output)
             bot.edit_message_text(
-                text=Translation.UPLOAD_START,
                 chat_id=update.chat.id,
+                text=exc.output.decode("UTF-8"),
                 message_id=a.message_id
             )
-            try:
-                logger.info(command_to_exec)
-                t_response = subprocess.check_output(command_to_exec, stderr=subprocess.STDOUT)
-            except subprocess.CalledProcessError as exc:
-                logger.info("Status : FAIL", exc.returncode, exc.output)
-                bot.edit_message_text(
-                    chat_id=update.chat.id,
-                    text=exc.output.decode("UTF-8"),
-                    message_id=a.message_id
-                )
-                return False
-            else:
-                logger.info(t_response)
-                t_response_arry = t_response.decode("UTF-8").split("\n")[-1].strip()
-                shorten_api_url = "http://ouo.io/api/{}?s={}".format(Config.OUO_IO_API_KEY, t_response_arry)
-                adfulurl = requests.get(shorten_api_url).text
+            return False
+        else:
+            logger.info(t_response)
+            t_response_arry = t_response.decode("UTF-8").split("\n")[-1].strip()
+            shorten_api_url = "http://ouo.io/api/{}?s={}".format(Config.OUO_IO_API_KEY, t_response_arry)
+            adfulurl = requests.get(shorten_api_url).text
         bot.edit_message_text(
             chat_id=update.chat.id,
             text=Translation.AFTER_GET_DL_LINK.format(adfulurl, max_days),
