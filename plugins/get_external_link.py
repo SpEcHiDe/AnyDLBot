@@ -28,7 +28,6 @@ logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
 from helper_funcs.chat_base import TRChatBase
 from helper_funcs.display_progress import progress_for_pyrogram
-from pydrive.drive import GoogleDrive
 
 
 @pyrogram.Client.on_message(pyrogram.Filters.command(["getlink"]))
