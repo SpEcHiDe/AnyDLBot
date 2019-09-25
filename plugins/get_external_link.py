@@ -33,15 +33,6 @@ from helper_funcs.display_progress import progress_for_pyrogram
 @pyrogram.Client.on_message(pyrogram.Filters.command(["getlink"]))
 async def get_link(bot, update):
     TRChatBase(update.from_user.id, update.text, "getlink")
-    if str(update.from_user.id) in Config.BANNED_USERS:
-        await bot.send_message(
-            chat_id=update.chat.id,
-            text=Translation.ABUSIVE_USERS,
-            reply_to_message_id=update.message_id,
-            disable_web_page_preview=True,
-            parse_mode=pyrogram.ParseMode.HTML
-        )
-        return
     logger.info(update.from_user)
     if update.reply_to_message is not None:
         reply_message = update.reply_to_message

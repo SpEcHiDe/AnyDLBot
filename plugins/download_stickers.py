@@ -30,30 +30,6 @@ from helper_funcs.display_progress import progress_for_pyrogram
 @pyrogram.Client.on_message(pyrogram.Filters.sticker)
 async def DownloadStickersBot(bot, update):
     TRChatBase(update.from_user.id, update.text, "DownloadStickersBot")
-    if str(update.from_user.id) in Config.BANNED_USERS:
-        await bot.edit_message_text(
-            chat_id=update.message.chat.id,
-            text=Translation.ABUSIVE_USERS,
-            message_id=update.message.message_id,
-            disable_web_page_preview=True,
-            parse_mode="html"
-        )
-        return
-    if str(update.from_user.id) not in Config.UTUBE_BOT_USERS:
-        # restrict free users from sending more links
-        if str(update.from_user.id) in Config.ADL_BOT_RQ:
-            current_time = time.time()
-            previous_time = Config.ADL_BOT_RQ[str(update.from_user.id)]
-            Config.ADL_BOT_RQ[str(update.from_user.id)] = time.time()
-            if round(current_time - previous_time) < Config.PROCESS_MAX_TIMEOUT:
-                await bot.send_message(
-                    chat_id=update.chat.id,
-                    text=Translation.FREE_USER_LIMIT_Q_SZE,
-                    reply_to_message_id=update.message_id
-                )
-                return
-        else:
-            Config.ADL_BOT_RQ[str(update.from_user.id)] = time.time()
     logger.info(update.from_user)
     download_location = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + "_DownloadStickersBot_" + str(update.from_user.id) + ".png"
     a = await bot.send_message(

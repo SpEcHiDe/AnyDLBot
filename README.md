@@ -1,19 +1,12 @@
 ## [AnyDLBot](https://telegram.dog/AnyDLBot)
 ---
 
-**There are multiple things I can do**:
+An Open Source ALL-In-One Telegram RoBot, that can do lot of things.
 
-👉 All Supported Video Formats of https://rg3.github.io/youtube-dl/supportedsites.html
+## Credits, and Thanks to
 
-👉 Upload as file from any HTTP link
-
-👉 Convert To Streamable Video, any Telegram media
-
-👉 ReName Telegram files, with custom thumbnail support
-
-👉 Get Low Speed Direct Download Link of any Telegram file
-
-👉 Trim / Cult small images / videos from large media files
+* [Dan Tès](https://telegram.dog/haskell) for his [Pyrogram Library](https://github.com/pyrogram/pyrogram)
+* [Yoily](https://telegram.dog/YoilyL) for his [UploaditBot](https://telegram.dog/UploaditBot)
 
 ### Installation
 
@@ -36,28 +29,6 @@ cp sample_config.py config.py
 python bot.py
 ```
 
-### @BotFather commands
-
-```
-start - Check If Bot is Online!
-help - How to use this Bot?
-me - Check your Subscription
-upgrade - Upgrade your Subscription
-deletethumbnail - Delete / Clear saved Custom Thumbnail
-getlink - Get Low Speed Direct Download Link
-converttoaudio - Convert Video Files in Telegram to Telegram Audios
-converttovideo - Convert to Streamable Video
-rename - (Long Press) and Rename Telegram Media
-extractstreams - Extract Streams from Telegram media
-ffmpegrobot - Get Info
-trim - (Long Press) and Enter TimeStamp
-downloadmedia - Download media to storage
-storageinfo - Get Info about currently saved Media in storage
-clearffmpegmedia - Clear stored media from storage
-unzip - Extract Compressed Files, inside Telegram
-generatecustomthumbnail - Generate Custom Thumbnail for your streamable videos
-generatescss - Generate SCreenShotS of Telegram media
-```
 
 - For FeedBack and Suggestions, please feel free to say in [@SpEcHlDe](https://telegram.dog/ThankTelegram)
 

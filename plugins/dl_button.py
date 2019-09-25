@@ -75,13 +75,6 @@ async def ddl_call_back(bot, update):
                 l = entity.length
                 youtube_dl_url = youtube_dl_url[o:o + l]
     description = Translation.CUSTOM_CAPTION_UL_FILE
-    if ("@" in custom_file_name) and (str(update.from_user.id) not in Config.UTUBE_BOT_USERS):
-        await bot.edit_message_text(
-            chat_id=update.message.chat.id,
-            text=Translation.NOT_AUTH_USER_TEXT,
-            message_id=update.message.message_id
-        )
-        return
     start = datetime.now()
     await bot.edit_message_text(
         text=Translation.DOWNLOAD_START,
