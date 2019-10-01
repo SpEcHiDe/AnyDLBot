@@ -34,6 +34,13 @@ from PIL import Image
 
 @pyrogram.Client.on_message(pyrogram.Filters.command(["converttoaudio"]))
 async def convert_to_audio(bot, update):
+    if update.from_user.id not in Config.AUTH_USERS:
+        await bot.delete_messages(
+            chat_id=update.chat.id,
+            message_ids=update.message_id,
+            revoke=True
+        )
+        return
     TRChatBase(update.from_user.id, update.text, "converttoaudio")
     if (update.reply_to_message is not None) and (update.reply_to_message.media is not None) :
         description = Translation.CUSTOM_CAPTION_UL_FILE

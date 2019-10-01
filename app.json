@@ -1,13 +1,21 @@
 {
   "name": "AnyDLBot",
-  "description": "Telegram's best YouTube Downloader. Create your Fork now.",
+  "description": "Telegram's best Open Source ALL-In-One Multi Purpose RoBot. Create your Fork now.",
   "keywords": [
     "telegram",
     "best",
     "youtube",
     "downloader",
-    "3"
+    "open",
+    "source",
+    "multi",
+    "purpose",
+    "ffmpeg",
+    "remote",
+    "uploader"
   ],
+  "success_url": "https://telegram.dog/AnyDLBot",
+  "website": "https://github.com/SpEcHiDe/AnyDLBot",
   "repository": "https://github.com/SpEcHiDe/AnyDLBot",
   "env": {
     "WEBHOOK": {
@@ -17,14 +25,6 @@
     "TG_BOT_TOKEN": {
       "description": "Your bot token, as a string.",
       "value": ""
-    },
-    "HTTP_DOMAIN": {
-      "description": "The Heroku App URL similar to https://<appname>.herokuapp.com/",
-      "value": "https://example.com/"
-    },
-    "PORT": {
-      "description": "Port to use for your webhooks",
-      "value": "5000"
     },
     "CHAT_BASE_TOKEN": {
       "description": "Your chat base token, as a string.",

@@ -39,6 +39,13 @@ from PIL import Image
 
 @pyrogram.Client.on_callback_query()
 async def button(bot, update):
+    if update.from_user.id not in Config.AUTH_USERS:
+        await bot.delete_messages(
+            chat_id=update.message.chat.id,
+            message_ids=update.message.message_id,
+            revoke=True
+        )
+        return
     # logger.info(update)
     cb_data = update.data
     if ":" in cb_data:

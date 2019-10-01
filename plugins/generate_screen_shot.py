@@ -31,6 +31,13 @@ from helper_funcs.display_progress import progress_for_pyrogram
 
 @pyrogram.Client.on_message(pyrogram.Filters.command(["generatescss"]))
 async def generate_screen_shot(bot, update):
+    if update.from_user.id not in Config.AUTH_USERS:
+        await bot.delete_messages(
+            chat_id=update.chat.id,
+            message_ids=update.message_id,
+            revoke=True
+        )
+        return
     TRChatBase(update.from_user.id, update.text, "generatescss")
     if update.reply_to_message is not None:
         download_location = Config.DOWNLOAD_LOCATION + "/"

@@ -33,6 +33,13 @@ from helper_funcs.help_uploadbot import DownLoadFile
 
 @pyrogram.Client.on_message(pyrogram.Filters.regex(pattern=".*http.*"))
 async def echo(bot, update):
+    if update.from_user.id not in Config.AUTH_USERS:
+        await bot.delete_messages(
+            chat_id=update.chat.id,
+            message_ids=update.message_id,
+            revoke=True
+        )
+        return
     # logger.info(update)
     TRChatBase(update.from_user.id, update.text, "/echo")
     # await bot.send_chat_action(
@@ -81,7 +88,7 @@ async def echo(bot, update):
                 o = entity.offset
                 l = entity.length
                 url = url[o:o + l]
-    if ("hotstar.com" in url) and (Config.HTTP_PROXY != ""):
+    if Config.HTTP_PROXY != "":
         command_to_exec = [
             "youtube-dl",
             "--no-warnings",

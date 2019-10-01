@@ -262,7 +262,6 @@ async def ddl_call_back(bot, update):
 
 
 async def download_coroutine(bot, session, url, file_name, chat_id, message_id, start):
-    CHUNK_SIZE = 2341
     downloaded = 0
     display_message = ""
     async with session.get(url, timeout=Config.PROCESS_MAX_TIMEOUT) as response:
@@ -279,11 +278,11 @@ File Size: {}""".format(url, humanbytes(total_length))
         )
         with open(file_name, "wb") as f_handle:
             while True:
-                chunk = await response.content.read(CHUNK_SIZE)
+                chunk = await response.content.read(Config.CHUNK_SIZE)
                 if not chunk:
                     break
                 f_handle.write(chunk)
-                downloaded += CHUNK_SIZE
+                downloaded += Config.CHUNK_SIZE
                 now = time.time()
                 diff = now - start
                 if round(diff % 5.00) == 0 or downloaded == total_length:
