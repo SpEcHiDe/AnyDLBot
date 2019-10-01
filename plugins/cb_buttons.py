@@ -86,8 +86,7 @@ async def button(bot, update):
                     progress=progress_for_pyrogram,
                     progress_args=(
                         Translation.UPLOAD_START,
-                        update.message.message_id,
-                        update.message.chat.id,
+                        update.message,
                         start_time
                     )
                 )
@@ -116,8 +115,7 @@ async def button(bot, update):
                 progress=progress_for_pyrogram,
                 progress_args=(
                     Translation.UPLOAD_START,
-                    update.message.message_id,
-                    update.message.chat.id,
+                    update.message,
                     start_time
                 )
             )

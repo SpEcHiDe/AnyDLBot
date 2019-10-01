@@ -58,7 +58,11 @@ async def unzip(bot, update):
                 message=reply_message,
                 file_name=saved_file_path,
                 progress=progress_for_pyrogram,
-                progress_args=(Translation.DOWNLOAD_START, a.message_id, update.chat.id, c_time)
+                progress_args=(
+                    Translation.DOWNLOAD_START,
+                    a,
+                    c_time
+                )
             )
         except (ValueError) as e:
             await bot.edit_message_text(

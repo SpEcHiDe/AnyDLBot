@@ -55,7 +55,11 @@ async def get_link(bot, update):
             message=reply_message,
             file_name=download_location,
             progress=progress_for_pyrogram,
-            progress_args=(Translation.DOWNLOAD_START, a.message_id, update.chat.id, c_time)
+            progress_args=(
+                Translation.DOWNLOAD_START,
+                a,
+                c_time
+            )
         )
         download_extension = after_download_file_name.rsplit(".", 1)[-1]
         await bot.edit_message_text(

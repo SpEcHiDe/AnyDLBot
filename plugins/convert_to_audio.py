@@ -55,7 +55,11 @@ async def convert_to_audio(bot, update):
             message=update.reply_to_message,
             file_name=download_location,
             progress=progress_for_pyrogram,
-            progress_args=(Translation.DOWNLOAD_START, a.message_id, update.chat.id, c_time)
+            progress_args=(
+                Translation.DOWNLOAD_START,
+                a,
+                c_time
+            )
         )
         if the_real_download_location is not None:
             await bot.edit_message_text(
@@ -114,7 +118,9 @@ async def convert_to_audio(bot, update):
                 reply_to_message_id=update.reply_to_message.message_id,
                 progress=progress_for_pyrogram,
                 progress_args=(
-                    Translation.UPLOAD_START, a.message_id, update.chat.id, c_time
+                    Translation.UPLOAD_START,
+                    a, 
+                    c_time
                 )
             )
             try:

@@ -92,7 +92,9 @@ async def trim(bot, update):
                     reply_to_message_id=update.message_id,
                     progress=progress_for_pyrogram,
                     progress_args=(
-                        Translation.UPLOAD_START, a.message_id, update.chat.id, c_time
+                        Translation.UPLOAD_START,
+                        a,
+                        c_time
                     )
                 )
                 os.remove(o)
@@ -123,7 +125,9 @@ async def trim(bot, update):
                     reply_to_message_id=update.message_id,
                     progress=progress_for_pyrogram,
                     progress_args=(
-                        Translation.UPLOAD_START, a.message_id, update.chat.id, c_time
+                        Translation.UPLOAD_START,
+                        a,
+                        c_time
                     )
                 )
                 c_time = time.time()
@@ -134,7 +138,9 @@ async def trim(bot, update):
                     reply_to_message_id=update.message_id,
                     progress=progress_for_pyrogram,
                     progress_args=(
-                        Translation.UPLOAD_START, a.message_id, update.chat.id, c_time
+                        Translation.UPLOAD_START,
+                        a,
+                        c_time
                     )
                 )
                 os.remove(o)
@@ -233,7 +239,9 @@ async def download_media(bot, update):
                 file_name=saved_file_path,
                 progress=progress_for_pyrogram,
                 progress_args=(
-                    Translation.DOWNLOAD_START, a.message_id, update.chat.id, c_time
+                    Translation.DOWNLOAD_START,
+                    a,
+                    c_time
                 )
             )
         except (ValueError) as e:
