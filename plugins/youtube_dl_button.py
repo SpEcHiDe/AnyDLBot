@@ -121,6 +121,8 @@ async def youtube_dl_call_back(bot, update):
             file_name = custom_file_name[0:60]
         if len(extension) == 4:
             file_name = custom_file_name[0:59]
+        else:
+            file_name = custom_file_name[0:58]
         custom_file_name = file_name + "." + extension
     download_directory = tmp_directory_for_each_user + "/" + custom_file_name
     command_to_exec = []
