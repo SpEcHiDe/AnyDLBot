@@ -109,6 +109,19 @@ async def youtube_dl_call_back(bot, update):
     tmp_directory_for_each_user = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id)
     if not os.path.isdir(tmp_directory_for_each_user):
         os.makedirs(tmp_directory_for_each_user)
+    if len(custom_file_name) > 64:
+        await bot.edit_message_text(
+            text="File Name is greater than 64 characters. Reducing File name to 64 charterers.",
+            chat_id=update.message.chat.id,
+            message_id=update.message.message_id
+        )
+        file_exten = custom_file_name.split(".")
+        extension = file_exten[-1]
+        if len(extension) == 3:
+            file_name = custom_file_name[0:60]
+        if len(extension) == 4:
+            file_name = custom_file_name[0:59]
+        custom_file_name = file_name + "." + extension
     download_directory = tmp_directory_for_each_user + "/" + custom_file_name
     command_to_exec = []
     if tg_send_type == "audio":
