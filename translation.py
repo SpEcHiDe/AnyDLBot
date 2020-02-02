@@ -1,10 +1,16 @@
 class Translation(object):
-    START_TEXT = """This is an @AnyDLBot clone created using the Open Source code available.
-Source Code: https://github.com/SpEcHiDe/AnyDLBot
-© @AnyDLBot"""
+    START_TEXT = """Hello,
+This is a Telegram URL Upload Bot!
+
+<b>Please send me any direct download URL Link, i can upload to telegram as File/Video</b>
+
+/help for more details..
+
+Support Group : @InFoTelGroup
+© @SpEcHlDe , @TGBotsZ & @CWProjects"""
     RENAME_403_ERR = "Sorry. You are not permitted to rename this file."
     ABS_TEXT = " Please don't be selfish."
-    UPGRADE_TEXT = "This is an @AnyDLBot clone created using the Open Source <a href='https://github.com/SpEcHiDe/AnyDLBot'>code</a>. \nStart @AnyDLBot to know Paid Plans!"
+    UPGRADE_TEXT = "</b>👉 Create own Clone Bot :</b> 👉 <a href="https://youtu.be/QkAkSLBgoYw">Diploy OWn URL Bot.</a>"
     FORMAT_SELECTION = "Select the desired format: <a href='{}'>file size might be approximate</a> \nIf you want to set custom thumbnail, send photo before or quickly after tapping on any of the below buttons.\nYou can use /deletethumbnail to delete the auto-generated thumbnail."
     SET_CUSTOM_USERNAME_PASSWORD = """If you want to download premium videos, provide in the following format:
 URL | filename | username | password"""
@@ -13,7 +19,7 @@ URL | filename | username | password"""
     UPLOAD_START = "trying to upload"
     RCHD_BOT_API_LIMIT = "size greater than maximum allowed size (50MB). Neverthless, trying to upload."
     RCHD_TG_API_LIMIT = "Downloaded in {} seconds.\nDetected File Size: {}\nSorry. But, I cannot upload files greater than 1.5GB due to Telegram API limitations."
-    AFTER_SUCCESSFUL_UPLOAD_MSG = "Please rate me if you find me useful. https://t.me/tlgrmcbot?start=anydl_bot-bot"
+    AFTER_SUCCESSFUL_UPLOAD_MSG = "Please rate me if you find me useful. Join : @TGBotsZ"
     AFTER_SUCCESSFUL_UPLOAD_MSG_WITH_TS = "Downloaded in {} seconds. \nPlease rate me if you find me useful. https://t.me/tlgrmcbot?start=anydl_bot-bot \nUploaded in {} seconds."
     NOT_AUTH_USER_TEXT = "Please /upgrade your subscription."
     NOT_AUTH_USER_TEXT_FILE_SIZE = "Detected File Size: {}. Free Users can only upload: {}\nPlease /upgrade your subscription.\nIf you think this is a bug, please contact <a href='https://telegram.dog/ThankTelegram'>@SpEcHlDe</a>"
@@ -23,25 +29,30 @@ URL | filename | username | password"""
     SAVED_RECVD_DOC_FILE = "Document Downloaded Successfully."
     CUSTOM_CAPTION_UL_FILE = " "
     NO_CUSTOM_THUMB_NAIL_FOUND = "No Custom ThumbNail found."
-    NO_VOID_FORMAT_FOUND = "no-one gonna help you\n<b>YouTubeDL</b> said: {}"
+    NO_VOID_FORMAT_FOUND = "ERROR...\n<b>YouTubeDL</b> said: {}"
     USER_ADDED_TO_DB = "User <a href='tg://user?id={}'>{}</a> added to {} till {}."
     CURENT_PLAN_DETAILS = """Current plan details
 --------
 Telegram ID: <code>{}</code>
-Plan name: <a href='https://t.me/SpEcHlDe/599'>{}</a>
-Expires on: {}"""
-    HELP_USER = """There are multiple things I can do:
-👉 <a href="https://t.me/SpEcHlDe/608">All Supported Video / File Formats, with custom file name and custom thumbnail support</a>
-👉 <a href="https://t.me/SpEcHlDe/609">Upload as file from any HTTP link, with custom thumbnail support</a>
-👉 <a href="https://telegram.dog/AnyDLBot">Convert To Streamable Video, any Telegram file</a>
-👉 <a href="https://telegram.dog/AnyDLBot">Convert To Telegram Audio, the media sent as Telegram Documents</a>
-👉 <a href="https://t.me/SpEcHlDe/610">ReName Telegram files, with custom thumbnail support</a>
-👉 <a href="https://t.me/SpEcHlDe/625">Generate Custom Thumbnail by sending two photos in a Media Album</a>
-👉 <a href="https://t.me/SpEcHlDe/653">Trim large videos</a>, and <a href="https://t.me/SpEcHlDe/652">Take Screenshots</a> of Telegram media files.
-👉 <a href="https://t.me/SpEcHlDe/657">Extract compressed Telegram media</a>
-👉 <a href="https://t.me/SpEcHlDe/660">Get a Telegram sticker as a Telegram downloadable media</a>
+Plan name: Free Cloned User
+Expires on: 31/12/2020"""
+    HELP_USER = """Hai am URL Uploader bot..
+    
+1. Send url (Link|New Name with Extension).
+2. Send Custom Thumbnail (Optional).
+3. Select the button.
+   SVideo - Give File as video with Screenshots
+   DFile  - Give File with Screenshots
+   Video  - Give File as video without Screenshots
+   DFile  - Give File without Screenshots
+   
+</b>👉 Create own Clone Bot :</b> 👉 <a href="https://youtu.be/QkAkSLBgoYw">Diploy OWn URL Bot.</a>
+
 --------
-Send /me to know current plan details"""
+Send /me to know current plan details
+
+Support Group : @InFoTelGroup
+© @TGBotsZ & @CWProjects"""
     REPLY_TO_DOC_GET_LINK = "Reply to a Telegram media to get High Speed Direct Download Link"
     REPLY_TO_DOC_FOR_C2V = "Reply to a Telegram media to convert"
     REPLY_TO_DOC_FOR_SCSS = "Reply to a Telegram media to get screenshots"
