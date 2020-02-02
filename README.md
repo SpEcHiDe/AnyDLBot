@@ -33,7 +33,7 @@ python bot.py
 
 * [TG Bots Updates](https://telegram.dog/TGBotsz)
 * [InFoTel Paid Apps](https://telegram.dog/InFoTel14)
-* [InFoTel Paid Apps](https://telegram.dog/InFoTelGroup)
+* [InFoTel Group](https://telegram.dog/InFoTelGroup)
 
 ## Credits, and Thanks to
 
