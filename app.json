@@ -1,18 +1,9 @@
 {
-  "name": "AnyDLBot",
-  "description": "Telegram's best Open Source ALL-In-One Multi Purpose RoBot. Create your Fork now.",
+  "name": "YouTubeDL",
+  "description": "Telegams best YouTube Downloder Robot. Create your Fork now.",
   "keywords": [
-    "telegram",
-    "best",
     "youtube",
-    "downloader",
-    "open",
-    "source",
-    "multi",
-    "purpose",
-    "ffmpeg",
-    "remote",
-    "uploader"
+    "downloader"
   ],
   "success_url": "https://telegram.dog/AnyDLBot",
   "website": "https://github.com/SpEcHiDe/AnyDLBot",
@@ -39,7 +30,7 @@
       "value": ""
     },
     "AUTH_USERS": {
-      "description": "allow only pre-defined users to use this bot",
+      "description": "allow public",
       "value": "7351948 20516707 23122162 500346573"
     },
     "DEF_THUMB_NAIL_VID_S": {
@@ -69,7 +60,7 @@
   }],
   "formation": {
     "worker": {
-      "quantity": 1,
+      "quantity": 4,
       "size": "free"
     }
   }
