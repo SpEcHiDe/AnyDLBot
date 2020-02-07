@@ -3,29 +3,6 @@
 # (c) Shrimadhav U K
 
 # the logging things
-import logging
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
-
-import json
-import math
-import os
-import shutil
-import subprocess
-import time
-
-# the secret configuration specific things
-if bool(os.environ.get("WEBHOOK", False)):
-    from sample_config import Config
-else:
-    from config import Config
-
-# the Strings used for this "thing"
-from translation import Translation
-
-import pyrogram
-logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
 from helper_funcs.chat_base import TRChatBase
 from helper_funcs.display_progress import progress_for_pyrogram, humanbytes
@@ -35,6 +12,26 @@ from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 # https://stackoverflow.com/a/37631799/4723940
 from PIL import Image
+import logging
+# the Strings used for this "thing"
+from translation import Translation
+import json
+import math
+import os
+import shutil
+import subprocess
+import time
+import pyrogram
+
+# the secret configuration specific things
+if bool(os.environ.get("WEBHOOK", False)):
+    from sample_config import Config
+else:
+    from config import Config
+logging.getLogger("pyrogram").setLevel(logging.WARNING)
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 
 @pyrogram.Client.on_callback_query()
@@ -60,11 +57,12 @@ async def button(bot, update):
             )
             return False
         zip_file_contents = os.listdir(extract_dir_path)
-        type_of_extract, index_extractor, undefined_tcartxe = cb_data.split(":")
+        type_of_extract, index_extractor, undefined_tcartxe = cb_data.split(
+            ":")
         if index_extractor == "NONE":
             try:
                 shutil.rmtree(extract_dir_path)
-            except:
+            except Exception:
                 pass
             await bot.edit_message_text(
                 chat_id=update.message.chat.id,
@@ -74,7 +72,8 @@ async def button(bot, update):
         elif index_extractor == "ALL":
             i = 0
             for file_content in zip_file_contents:
-                current_file_name = os.path.join(extract_dir_path, file_content)
+                current_file_name = os.path.join(
+                    extract_dir_path, file_content)
                 start_time = time.time()
                 await bot.send_document(
                     chat_id=update.message.chat.id,
@@ -94,14 +93,14 @@ async def button(bot, update):
                 os.remove(current_file_name)
             try:
                 shutil.rmtree(extract_dir_path)
-            except:
+            except Exception:
                 pass
             await bot.edit_message_text(
                 chat_id=update.message.chat.id,
                 text=Translation.ZIP_UPLOADED_STR.format(i, "0"),
                 message_id=update.message.message_id
             )
-        else:
+        else Exception:
             file_content = zip_file_contents[int(index_extractor)]
             current_file_name = os.path.join(extract_dir_path, file_content)
             start_time = time.time()
@@ -121,7 +120,7 @@ async def button(bot, update):
             )
             try:
                 shutil.rmtree(extract_dir_path)
-            except:
+            except Exception:
                 pass
             await bot.edit_message_text(
                 chat_id=update.message.chat.id,

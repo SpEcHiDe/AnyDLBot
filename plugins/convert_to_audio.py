@@ -42,7 +42,7 @@ async def convert_to_audio(bot, update):
         )
         return
     TRChatBase(update.from_user.id, update.text, "converttoaudio")
-    if (update.reply_to_message is not None) and (update.reply_to_message.media is not None) :
+    if (update.reply_to_message is not None) and (update.reply_to_message.media is not None):
         description = Translation.CUSTOM_CAPTION_UL_FILE
         download_location = Config.DOWNLOAD_LOCATION + "/"
         a = await bot.send_message(
@@ -81,10 +81,12 @@ async def convert_to_audio(bot, update):
             width = 0
             height = 0
             duration = 0
-            metadata = extractMetadata(createParser(the_real_download_location))
+            metadata = extractMetadata(
+                createParser(the_real_download_location))
             if metadata.has("duration"):
                 duration = metadata.get('duration').seconds
-            thumb_image_path = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg"
+            thumb_image_path = Config.DOWNLOAD_LOCATION + \
+                "/" + str(update.from_user.id) + ".jpg"
             if not os.path.exists(thumb_image_path):
                 thumb_image_path = None
             else:
@@ -97,7 +99,8 @@ async def convert_to_audio(bot, update):
                 # resize image
                 # ref: https://t.me/PyrogramChat/44663
                 # https://stackoverflow.com/a/21669827/4723940
-                Image.open(thumb_image_path).convert("RGB").save(thumb_image_path)
+                Image.open(thumb_image_path).convert(
+                    "RGB").save(thumb_image_path)
                 img = Image.open(thumb_image_path)
                 # https://stackoverflow.com/a/37631799/4723940
                 # img.thumbnail((90, 90))
@@ -119,7 +122,7 @@ async def convert_to_audio(bot, update):
                 progress=progress_for_pyrogram,
                 progress_args=(
                     Translation.UPLOAD_START,
-                    a, 
+                    a,
                     c_time
                 )
             )
@@ -127,7 +130,7 @@ async def convert_to_audio(bot, update):
                 os.remove(thumb_image_path)
                 os.remove(the_real_download_location)
                 os.remove(audio_file_location_path)
-            except:
+            except Exception:
                 pass
             await bot.edit_message_text(
                 text=Translation.AFTER_SUCCESSFUL_UPLOAD_MSG,

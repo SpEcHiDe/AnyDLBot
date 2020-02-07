@@ -68,12 +68,13 @@ async def get_link(bot, update):
             message_id=a.message_id
         )
         end_one = datetime.now()
-        url = "https://transfer.sh/{}.{}".format(str(update.from_user.id), str(download_extension))
+        url = "https://transfer.sh/{}.{}".format(
+            str(update.from_user.id), str(download_extension))
         max_days = "5"
         command_to_exec = [
             "curl",
             # "-H", 'Max-Downloads: 1',
-            "-H", 'Max-Days: 5', # + max_days + '',
+            "-H", 'Max-Days: 5',  # + max_days + '',
             "--upload-file", after_download_file_name,
             url
         ]
@@ -84,7 +85,8 @@ async def get_link(bot, update):
         )
         try:
             logger.info(command_to_exec)
-            t_response = subprocess.check_output(command_to_exec, stderr=subprocess.STDOUT)
+            t_response = subprocess.check_output(
+                command_to_exec, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as exc:
             logger.info("Status : FAIL", exc.returncode, exc.output)
             await bot.edit_message_text(
@@ -95,10 +97,12 @@ async def get_link(bot, update):
             return False
         else:
             logger.info(t_response)
-            t_response_arry = t_response.decode("UTF-8").split("\n")[-1].strip()
+            t_response_arry = t_response.decode(
+                "UTF-8").split("\n")[-1].strip()
         await bot.edit_message_text(
             chat_id=update.chat.id,
-            text=Translation.AFTER_GET_DL_LINK.format(t_response_arry, max_days),
+            text=Translation.AFTER_GET_DL_LINK.format(
+                t_response_arry, max_days),
             parse_mode="html",
             message_id=a.message_id,
             disable_web_page_preview=True

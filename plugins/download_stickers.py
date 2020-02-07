@@ -38,7 +38,9 @@ async def DownloadStickersBot(bot, update):
         return
     TRChatBase(update.from_user.id, update.text, "DownloadStickersBot")
     logger.info(update.from_user)
-    download_location = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + "_DownloadStickersBot_" + str(update.from_user.id) + ".png"
+    download_location = Config.DOWNLOAD_LOCATION + "/" + \
+        str(update.from_user.id) + "_DownloadStickersBot_" + \
+        str(update.from_user.id) + ".png"
     a = await bot.send_message(
         chat_id=update.chat.id,
         text=Translation.DOWNLOAD_START,

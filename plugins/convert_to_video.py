@@ -79,10 +79,12 @@ async def convert_to_video(bot, update):
             width = 0
             height = 0
             duration = 0
-            metadata = extractMetadata(createParser(the_real_download_location))
+            metadata = extractMetadata(
+                createParser(the_real_download_location))
             if metadata.has("duration"):
                 duration = metadata.get('duration').seconds
-            thumb_image_path = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg"
+            thumb_image_path = Config.DOWNLOAD_LOCATION + \
+                "/" + str(update.from_user.id) + ".jpg"
             if not os.path.exists(thumb_image_path):
                 thumb_image_path = None
             else:
@@ -95,7 +97,8 @@ async def convert_to_video(bot, update):
                 # resize image
                 # ref: https://t.me/PyrogramChat/44663
                 # https://stackoverflow.com/a/21669827/4723940
-                Image.open(thumb_image_path).convert("RGB").save(thumb_image_path)
+                Image.open(thumb_image_path).convert(
+                    "RGB").save(thumb_image_path)
                 img = Image.open(thumb_image_path)
                 # https://stackoverflow.com/a/37631799/4723940
                 # img.thumbnail((90, 90))
