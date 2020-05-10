@@ -65,6 +65,14 @@ async def youtube_dl_call_back(bot, update):
         if len(url_parts) == 2:
             youtube_dl_url = url_parts[0]
             custom_file_name = url_parts[1]
+            if len(custom_file_name) > 64:
+                await update.message.reply_text(
+                    Translation.IFLONG_FILE_NAME.format(
+                        alimit="64",
+                        num=len(custom_file_name)
+                    )
+                )
+                return
         elif len(url_parts) == 4:
             youtube_dl_url = url_parts[0]
             custom_file_name = url_parts[1]
