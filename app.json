@@ -1,18 +1,12 @@
 {
-  "name": "TG URL Uploader",
+  "name": "TG Rename Bot",
   "description": "Telegram's best Open Source ALL-In-One Multi Purpose RoBot. Create your Fork now.",
   "keywords": [
     "telegram",
     "best",
-    "youtube",
-    "downloader",
     "open",
     "source",
-    "multi",
-    "purpose",
-    "ffmpeg",
-    "remote",
-    "uploader"
+    "Rename"
   ],
   "success_url": "https://telegram.dog/AnyDLBot",
   "website": "https://github.com/SpEcHiDe/AnyDLBot",
@@ -40,7 +34,7 @@
     },
     "AUTH_USERS": {
       "description": "allow only pre-defined users to use this bot",
-      "value": "7351948 20516707 23122162 500346573"
+      "value": "7351948 466337795"
     },
     "BANNED_USERS": {
       "description": "Banned Unwanted members..",
@@ -67,8 +61,6 @@
   ],
   "buildpacks": [{
     "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest"
-  }, {
-    "url": "https://github.com/opendoor-labs/heroku-buildpack-p7zip"
   }, {
     "url": "heroku/python"
   }],
