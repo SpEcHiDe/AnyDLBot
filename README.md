@@ -1,23 +1,23 @@
-## [AnyDLBot](https://telegram.dog/AnyDLBot) - Clone
+## Rename Bot - Clone of  [AnyDLBot](https://telegram.dog/AnyDLBot)
 ---
 
-An Open Source ALL-In-One Telegram RoBot, that can do lot of things.
+An Open Source Rename Telegram RoBot
 
-**My Features**:
+**My Feature**:
 
-👉 All Supported Video Formats of https://rg3.github.io/youtube-dl/supportedsites.html
-
-👉 Upload as file from any HTTP link
+👉 Rename any Telegram Files with Custom Thumbnail Support
 
 ### Installation
 
-#### The Easiest Way
-
-**upgrade** your subscription for [@AnyDLBot](https://telegram.dog/AnyDLBot) without having to run anything on your own
-
 #### The Easy Way
 
-**Watch our Video for Create own Bot** - 👉 https://youtu.be/QkAkSLBgoYw
+**Watch our Video for Create own Bot** - 👉 https://youtu.be/yYHrSnuYXpA
+
+### You can also tap the Deploy To Heroku button below to deploy straight to Heroku!
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy?template=https://github.com/erichdanikeninfo/TG-Rename-Bot)
+
+**upgrade** your subscription for [@AnyDLBot](https://telegram.dog/AnyDLBot) without having to run anything on your own
 
 #### The Hard Way
 
@@ -37,6 +37,7 @@ python bot.py
 
 ## Credits, and Thanks to
 
+* [Dan Tès](https://telegram.dog/SpEcHlDe) for his [AnyDLBot](https://github.com/SpEcHiDe/AnyDLBot)
 * [Dan Tès](https://telegram.dog/haskell) for his [Pyrogram Library](https://github.com/pyrogram/pyrogram)
 * [Yoily](https://telegram.dog/YoilyL) for his [UploaditBot](https://telegram.dog/UploaditBot)
 
@@ -44,3 +45,4 @@ python bot.py
 
 #### LICENSE
 - GPLv3
+
