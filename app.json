@@ -1,6 +1,6 @@
 {
   "name": "TG Rename Bot",
-  "description": "Telegram's best Open Source ALL-In-One Multi Purpose RoBot. Create your Fork now.",
+  "description": "Telegram's best Open Source Rename Bot. Create your Fork now.",
   "keywords": [
     "telegram",
     "best",
@@ -10,7 +10,7 @@
   ],
   "success_url": "https://telegram.dog/AnyDLBot",
   "website": "https://github.com/SpEcHiDe/AnyDLBot",
-  "repository": "https://github.com/SpEcHiDe/AnyDLBot",
+  "repository": "https://github.com/erichdanikeninfo/TG-Rename-Bot",
   "env": {
     "WEBHOOK": {
       "description": "Setting this to ANYTHING will enable webhooks when in env mode",
@@ -41,19 +41,9 @@
       "value": "",
       "required": false
     },
-    "DEF_THUMB_NAIL_VID_S": {
-      "description": "default thumbnail to be used in the videos. Incase, youtube-dl is unable to find a thumbnail.",
-      "value": "",
-      "required": false
-    },
     "CHUNK_SIZE": {
       "description": "chunk size that should be used with requests",
-      "value": "",
-      "required": false
-    },
-    "HTTP_PROXY": {
-      "description": "proxy for accessing youtube-dl in GeoRestricted Areas. Get your own proxy from https://github.com/rg3/youtube-dl/issues/1091#issuecomment-230163061",
-      "value": "",
+      "value": "128",
       "required": false
     }
   },
