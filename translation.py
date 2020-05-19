@@ -26,13 +26,8 @@ This is a Telegram Rename Bot!
     
 1. Send me any Telegram File.
 2. Reply to that message to /rename new name.extension.
-   
-<b>👉 Create own Clone Bot :</b> 👉 <a href="https://youtu.be/yYHrSnuYXpA">Diploy</a>
-
 --------
-
-Support Group : @InFoTelGroup
-© @SpEcHlDe @TGBotsZ"""
+"""
     REPLY_TO_DOC_FOR_RENAME_FILE = "Reply to a Telegram media to `/rename New Name.extension` with custom thumbnail support.."
     ABUSIVE_USERS = "You are not allowed to use this bot. If you think this is a mistake, please check /me to remove this restriction."
     FREE_USER_LIMIT_Q_SZE = """Cannot Process.
