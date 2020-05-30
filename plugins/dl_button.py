@@ -4,9 +4,11 @@
 
 # the logging things
 import logging
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.DEBUG, 
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+LOGGER = logging.getLogger(__name__)
 
 import asyncio
 import aiohttp
@@ -18,7 +20,7 @@ import time
 from datetime import datetime
 
 # the secret configuration specific things
-if bool(os.environ.get("WEBHOOK", False)):
+if bool(os.environ.get("ENV", False)):
     from sample_config import Config
 else:
     from config import Config
@@ -29,7 +31,6 @@ from translation import Translation
 import pyrogram
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
-from helper_funcs.chat_base import TRChatBase
 from helper_funcs.display_progress import progress_for_pyrogram, humanbytes, TimeFormatter
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
@@ -38,7 +39,7 @@ from PIL import Image
 
 
 async def ddl_call_back(bot, update):
-    logger.info(update)
+    LOGGER.info(update)
     cb_data = update.data
     # youtube_dl extractors
     tg_send_type, youtube_dl_format, youtube_dl_ext = cb_data.split("=")
@@ -64,8 +65,8 @@ async def ddl_call_back(bot, update):
         if custom_file_name is not None:
             custom_file_name = custom_file_name.strip()
         # https://stackoverflow.com/a/761825/4723940
-        logger.info(youtube_dl_url)
-        logger.info(custom_file_name)
+        LOGGER.info(youtube_dl_url)
+        LOGGER.info(custom_file_name)
     else:
         for entity in update.message.reply_to_message.entities:
             if entity.type == "text_link":
@@ -233,7 +234,7 @@ async def ddl_call_back(bot, update):
                     )
                 )
             else:
-                logger.info("Did this happen? :\\")
+                LOGGER.info("Did this happen? :\\")
             end_two = datetime.now()
             try:
                 os.remove(download_directory)
@@ -293,7 +294,9 @@ File Size: {}""".format(url, humanbytes(total_length))
 URL: {}
 File Size: {}
 Downloaded: {}
-ETA: {}""".format(
+ETA: {}
+
+©️ @AnyDLBot""".format(
     url,
     humanbytes(total_length),
     humanbytes(downloaded),
@@ -307,6 +310,6 @@ ETA: {}""".format(
                             )
                             display_message = current_message
                     except Exception as e:
-                        logger.info(str(e))
+                        LOGGER.info(str(e))
                         pass
         return await response.release()

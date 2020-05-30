@@ -4,9 +4,11 @@
 
 # the logging things
 import logging
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.DEBUG, 
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+LOGGER = logging.getLogger(__name__)
 
 import asyncio
 import json
@@ -15,7 +17,7 @@ import os
 import time
 
 # the secret configuration specific things
-if bool(os.environ.get("WEBHOOK", False)):
+if bool(os.environ.get("ENV", False)):
     from sample_config import Config
 else:
     from config import Config
@@ -26,7 +28,6 @@ from translation import Translation
 import pyrogram
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
-from helper_funcs.chat_base import TRChatBase
 from helper_funcs.display_progress import humanbytes
 from helper_funcs.help_uploadbot import DownLoadFile
 
@@ -34,19 +35,14 @@ from helper_funcs.help_uploadbot import DownLoadFile
 @pyrogram.Client.on_message(pyrogram.Filters.regex(pattern=".*http.*"))
 async def echo(bot, update):
     if update.from_user.id not in Config.AUTH_USERS:
-        await bot.delete_messages(
-            chat_id=update.chat.id,
-            message_ids=update.message_id,
-            revoke=True
-        )
+        await update.delete()
         return
-    # logger.info(update)
-    TRChatBase(update.from_user.id, update.text, "/echo")
+    # LOGGER.info(update)
     # await bot.send_chat_action(
     #     chat_id=update.chat.id,
     #     action="typing"
     # )
-    logger.info(update.from_user)
+    LOGGER.info(update.from_user)
     url = update.text
     youtube_dl_username = None
     youtube_dl_password = None
@@ -88,7 +84,7 @@ async def echo(bot, update):
                 o = entity.offset
                 l = entity.length
                 url = url[o:o + l]
-    if Config.HTTP_PROXY != "":
+    if Config.HTTP_PROXY is not None:
         command_to_exec = [
             "youtube-dl",
             "--no-warnings",
@@ -130,10 +126,9 @@ async def echo(bot, update):
         error_message = e_response.replace("please report this issue on https://yt-dl.org/bug . Make sure you are using the latest version; see  https://yt-dl.org/update  on how to update. Be sure to call youtube-dl with the --verbose flag and include its complete output.", "")
         if "This video is only available for registered users." in error_message:
             error_message += Translation.SET_CUSTOM_USERNAME_PASSWORD
-        await bot.send_message(
-            chat_id=update.chat.id,
+        await update.reply_text(
             text=Translation.NO_VOID_FORMAT_FOUND.format(str(error_message)),
-            reply_to_message_id=update.message_id,
+            quote=True,
             parse_mode="html",
             disable_web_page_preview=True
         )
@@ -268,12 +263,12 @@ async def echo(bot, update):
             update.message_id,
             update.chat.id
         )
-        await bot.send_message(
-            chat_id=update.chat.id,
-            text=Translation.FORMAT_SELECTION.format(thumbnail) + "\n" + Translation.SET_CUSTOM_USERNAME_PASSWORD,
+        await update.reply_photo(
+            photo=thumb_image_path,
+            quote=True,
+            caption=Translation.FORMAT_SELECTION.format(thumbnail) + "\n" + Translation.SET_CUSTOM_USERNAME_PASSWORD,
             reply_markup=reply_markup,
-            parse_mode="html",
-            reply_to_message_id=update.message_id
+            parse_mode="html"
         )
     else:
         # fallback for nonnumeric port a.k.a seedbox.io
@@ -293,9 +288,10 @@ async def echo(bot, update):
             )
         ])
         reply_markup = pyrogram.InlineKeyboardMarkup(inline_keyboard)
-        await bot.send_message(
-            chat_id=update.chat.id,
-            text=Translation.FORMAT_SELECTION.format(""),
+        await update.reply_photo(
+            photo=Config.DEF_THUMB_NAIL_VID_S,
+            quote=True,
+            caption=Translation.FORMAT_SELECTION.format(""),
             reply_markup=reply_markup,
             parse_mode="html",
             reply_to_message_id=update.message_id

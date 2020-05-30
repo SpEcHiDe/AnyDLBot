@@ -4,14 +4,16 @@
 
 # the logging things
 import logging
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.DEBUG, 
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+LOGGER = logging.getLogger(__name__)
 
 import os
 
 # the secret configuration specific things
-if bool(os.environ.get("WEBHOOK", False)):
+if bool(os.environ.get("ENV", False)):
     from sample_config import Config
 else:
     from config import Config

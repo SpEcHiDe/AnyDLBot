@@ -2,6 +2,7 @@
 ---
 
 An Open Source ALL-In-One Telegram RoBot, that can do lot of things.
+👉 check the 'branches' for all the features..!
 
 ## Credits, and Thanks to
 
@@ -36,8 +37,7 @@ class Development(Config):
   API_HASH = "eb06d4abfb49dc3eeb1aeb98ae0f581e"
   TG_BOT_TOKEN = ""
   AUTH_USERS = [
-      "7351948"
-      # is a string for LEGACY purposes
+    7351948
   ]
 ```
 
