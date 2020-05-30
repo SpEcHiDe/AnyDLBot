@@ -22,3 +22,6 @@ class Config(object):
     HTTP_PROXY = os.environ.get("HTTP_PROXY", None)
     # maximum message length in Telegram
     MAX_MESSAGE_LENGTH = 4096
+    # add config vars for the display progress
+    FINISHED_PROGRESS_STR = os.environ.get("FINISHED_PROGRESS_STR", "█")
+    UN_FINISHED_PROGRESS_STR = os.environ.get("UN_FINISHED_PROGRESS_STR", "░")
