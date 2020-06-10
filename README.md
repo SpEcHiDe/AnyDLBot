@@ -4,6 +4,9 @@
 An Open Source ALL-In-One Telegram RoBot, that can do lot of things.
 👉 check the 'branches' for all the features..!
 
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/salmanpdr/AnyDLBot)
+
+
 ## Credits, and Thanks to
 
 * [Dan Tès](https://telegram.dog/haskell) for his [Pyrogram Library](https://github.com/pyrogram/pyrogram)
