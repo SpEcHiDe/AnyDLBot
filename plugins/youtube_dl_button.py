@@ -179,7 +179,7 @@ async def youtube_dl_call_back(bot, update):
         time_taken_for_download = (end_one -start).seconds
         file_size = Config.TG_MAX_FILE_SIZE + 1
         download_directory_dirname = os.path.dirname(download_directory)
-        download_directory_contents = os.path.listdir(download_directory_dirname)
+        download_directory_contents = os.listdir(download_directory_dirname)
         for download_directory_c in download_directory_contents:
             current_file_name = os.path.join(
                 download_directory_dirname,
