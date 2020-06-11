@@ -257,7 +257,7 @@ async def echo(bot, update):
             thumbnail_image,
             Config.DOWNLOAD_LOCATION + "/" +
             str(update.from_user.id) + ".jpg",
-            Config.CHUNK_SIZE,
+            128,
             None,  # bot,
             Translation.DOWNLOAD_START,
             update.message_id,
