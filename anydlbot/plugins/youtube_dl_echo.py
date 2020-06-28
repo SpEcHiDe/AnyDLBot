@@ -80,8 +80,8 @@ async def echo(bot, update):
             youtube_dl_username = youtube_dl_username.strip()
         if youtube_dl_password is not None:
             youtube_dl_password = youtube_dl_password.strip()
-        logger.info(url)
-        logger.info(file_name)
+        LOGGER.info(url)
+        LOGGER.info(file_name)
     else:
         for entity in update.entities:
             if entity.type == "text_link":

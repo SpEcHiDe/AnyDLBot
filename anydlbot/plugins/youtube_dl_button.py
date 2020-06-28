@@ -221,7 +221,7 @@ async def youtube_dl_call_back(bot, update):
                 # get the correct width, height, and duration for videos greater than 10MB
                 if os.path.exists(thumb_image_path):
                     width = 0
-                    height = 0
+                    height = 90
                     
                     # resize image
                     # ref: https://t.me/PyrogramChat/44663
