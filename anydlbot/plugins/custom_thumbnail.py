@@ -14,22 +14,24 @@ import os
 from PIL import Image
 import time
 
-# the secret configuration specific things
-if bool(os.environ.get("ENV", False)):
-    from sample_config import Config
-else:
-    from config import Config
+from anydlbot import(
+        AUTH_USERS,
+        DOWNLOAD_LOCATION
+)
 
 # the Strings used for this "thing"
 from translation import Translation
 
-import pyrogram
+from pyrogram import(
+        Client,
+        Filters
+)
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.photo)
+@Client.on_message(Filters.photo)
 async def save_photo(bot, update):
-    if update.from_user.id not in Config.AUTH_USERS:
+    if update.from_user.id not in AUTH_USERS:
         await bot.delete_messages(
             chat_id=update.chat.id,
             message_ids=update.message_id,
@@ -37,7 +39,7 @@ async def save_photo(bot, update):
         )
         return
     # received single photo
-    download_location = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg"
+    download_location = DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg"
     await bot.download_media(
         message=update,
         file_name=download_location
@@ -49,16 +51,16 @@ async def save_photo(bot, update):
     )
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.command(["deletethumbnail"]))
+@Client.on_message(Filters.command(["deletethumbnail"]))
 async def delete_thumbnail(bot, update):
-    if update.from_user.id not in Config.AUTH_USERS:
+    if update.from_user.id not in AUTH_USERS:
         await bot.delete_messages(
             chat_id=update.chat.id,
             message_ids=update.message_id,
             revoke=True
         )
         return
-    download_location = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id)
+    download_location = DOWNLOAD_LOCATION + "/" + str(update.from_user.id)
     try:
         os.remove(download_location + ".jpg")
         # os.remove(download_location + ".json")

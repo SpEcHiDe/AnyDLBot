@@ -22,7 +22,7 @@ virtualenv -p python3 VENV
 . ./VENV/bin/activate
 pip install -r requirements.txt
 # <Create config.py with variables as given below>
-python bot.py
+python3 -m anydlbot
 ```
 
 An example `config.py` file could be:
@@ -30,7 +30,7 @@ An example `config.py` file could be:
 **Not All of the variables are mandatory**
 
 ```python3
-from sample_config import Config
+from anydlbot.sample_config import Config
 
 class Development(Config):
   APP_ID = 6

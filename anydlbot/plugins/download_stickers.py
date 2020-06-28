@@ -13,29 +13,31 @@ LOGGER = logging.getLogger(__name__)
 import os
 import time
 
-# the secret configuration specific things
-if bool(os.environ.get("ENV", False)):
-    from sample_config import Config
-else:
-    from config import Config
+from anydlbot import(
+        AUTH_USERS,
+        DOWNLOAD_LOCATION
+)
 
 # the Strings used for this "thing"
 from translation import Translation
 
-import pyrogram
+from pyrogram import(
+        Client,
+        Filters
+)
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
-from helper_funcs.display_progress import progress_for_pyrogram
+from anydlbot.helper_funcs.display_progress import progress_for_pyrogram
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.sticker)
+@Client.on_message(Filters.sticker)
 async def DownloadStickersBot(bot, update):
-    if update.from_user.id not in Config.AUTH_USERS:
+    if update.from_user.id not in AUTH_USERS:
         await update.delete()
         return
     
     LOGGER.info(update.from_user)
-    download_location = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + "_DownloadStickersBot_" + str(update.from_user.id) + ".png"
+    download_location = DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + "_DownloadStickersBot_" + str(update.from_user.id) + ".png"
     a = await bot.send_message(
         chat_id=update.chat.id,
         text=Translation.DOWNLOAD_START,
