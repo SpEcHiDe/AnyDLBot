@@ -14,11 +14,10 @@ import math
 import os
 import time
 
-# the secret configuration specific things
-if bool(os.environ.get("ENV", False)):
-    from sample_config import Config
-else:
-    from config import Config
+from anydlbot import(
+        FINISHED_PROGRESS_STR,
+        UN_FINISHED_PROGRESS_STR
+)
 
 # the Strings used for this "thing"
 from translation import Translation
@@ -45,8 +44,8 @@ async def progress_for_pyrogram(
         estimated_total_time = TimeFormatter(milliseconds=estimated_total_time)
 
         progress = "[{0}{1}] \nP: {2}%\n".format(
-            ''.join([Config.FINISHED_PROGRESS_STR for i in range(math.floor(percentage / 5))]),
-            ''.join([Config.UN_FINISHED_PROGRESS_STR for i in range(20 - math.floor(percentage / 5))]),
+            ''.join([FINISHED_PROGRESS_STR for i in range(math.floor(percentage / 5))]),
+            ''.join([UN_FINISHED_PROGRESS_STR for i in range(20 - math.floor(percentage / 5))]),
             round(percentage, 2))
 
         tmp = progress + "{0} of {1}\nSpeed: {2}/s\nETA: {3}\n".format(

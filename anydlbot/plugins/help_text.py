@@ -12,26 +12,22 @@ LOGGER = logging.getLogger(__name__)
 
 import os
 
-# the secret configuration specific things
-if bool(os.environ.get("ENV", False)):
-    from sample_config import Config
-else:
-    from config import Config
-
 # the Strings used for this "thing"
 from translation import Translation
 
-import pyrogram
+from pyrogram import(
+        Client,
+        Filters
+)
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
 
 def GetExpiryDate(chat_id):
     expires_at = (str(chat_id), "Source Cloned User", "1970.01.01.12.00.00")
-    Config.AUTH_USERS.add(7351948)
     return expires_at
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.command(["help", "about"]))
+@Client.on_message(Filters.command(["help", "about"]))
 async def help_user(bot, update):
     # LOGGER.info(update)
     await bot.send_message(
@@ -43,7 +39,7 @@ async def help_user(bot, update):
     )
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.command(["me"]))
+@Client.on_message(Filters.command(["me"]))
 async def get_me_info(bot, update):
     # LOGGER.info(update)
     chat_id = str(update.from_user.id)
@@ -57,7 +53,7 @@ async def get_me_info(bot, update):
     )
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.command(["start"]))
+@Client.on_message(Filters.command(["start"]))
 async def start(bot, update):
     # LOGGER.info(update)
     await bot.send_message(
@@ -67,7 +63,7 @@ async def start(bot, update):
     )
 
 
-@pyrogram.Client.on_message(pyrogram.Filters.command(["upgrade"]))
+@Client.on_message(Filters.command(["upgrade"]))
 async def upgrade(bot, update):
     # LOGGER.info(update)
     await bot.send_message(

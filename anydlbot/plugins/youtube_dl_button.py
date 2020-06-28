@@ -18,33 +18,33 @@ import shutil
 import time
 from datetime import datetime
 
-# the secret configuration specific things
-if bool(os.environ.get("ENV", False)):
-    from sample_config import Config
-else:
-    from config import Config
+from anydlbot import(
+        DOWNLOAD_LOCATION,
+        TG_MAX_FILE_SIZE,
+        HTTP_PROXY
+)
 
 # the Strings used for this "thing"
 from translation import Translation
 
-import pyrogram
+from pyrogram import InputMediaPhoto
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
-from helper_funcs.display_progress import progress_for_pyrogram, humanbytes
+from anydlbot.helper_funcs.display_progress import progress_for_pyrogram, humanbytes
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 # https://stackoverflow.com/a/37631799/4723940
 from PIL import Image
-from helper_funcs.help_Nekmo_ffmpeg import generate_screen_shots
+from anydlbot.helper_funcs.help_Nekmo_ffmpeg import generate_screen_shots
 
 
 async def youtube_dl_call_back(bot, update):
     cb_data = update.data
     # youtube_dl extractors
     tg_send_type, youtube_dl_format, youtube_dl_ext = cb_data.split("|")
-    thumb_image_path = Config.DOWNLOAD_LOCATION + \
+    thumb_image_path = DOWNLOAD_LOCATION + \
         "/" + str(update.from_user.id) + ".jpg"
-    save_ytdl_json_path = Config.DOWNLOAD_LOCATION + \
+    save_ytdl_json_path = DOWNLOAD_LOCATION + \
         "/" + str(update.from_user.id) + ".json"
     try:
         with open(save_ytdl_json_path, "r", encoding="utf8") as f:
@@ -109,7 +109,7 @@ async def youtube_dl_call_back(bot, update):
     if "fulltitle" in response_json:
         description = response_json["fulltitle"][0:1021]
         # escape Markdown and special characters
-    tmp_directory_for_each_user = Config.DOWNLOAD_LOCATION + "/" + str(update.from_user.id)
+    tmp_directory_for_each_user = DOWNLOAD_LOCATION + "/" + str(update.from_user.id)
     if not os.path.isdir(tmp_directory_for_each_user):
         os.makedirs(tmp_directory_for_each_user)
     download_directory = tmp_directory_for_each_user + "/" + custom_file_name
@@ -118,7 +118,7 @@ async def youtube_dl_call_back(bot, update):
         command_to_exec = [
             "youtube-dl",
             "-c",
-            "--max-filesize", str(Config.TG_MAX_FILE_SIZE),
+            "--max-filesize", str(TG_MAX_FILE_SIZE),
             "--prefer-ffmpeg",
             "--extract-audio",
             "--audio-format", youtube_dl_ext,
@@ -134,15 +134,15 @@ async def youtube_dl_call_back(bot, update):
         command_to_exec = [
             "youtube-dl",
             "-c",
-            "--max-filesize", str(Config.TG_MAX_FILE_SIZE),
+            "--max-filesize", str(TG_MAX_FILE_SIZE),
             "--embed-subs",
             "-f", minus_f_format,
             "--hls-prefer-ffmpeg", youtube_dl_url,
             "-o", download_directory
         ]
-    if Config.HTTP_PROXY is not None:
+    if HTTP_PROXY is not None:
         command_to_exec.append("--proxy")
-        command_to_exec.append(Config.HTTP_PROXY)
+        command_to_exec.append(HTTP_PROXY)
     if youtube_dl_username is not None:
         command_to_exec.append("--username")
         command_to_exec.append(youtube_dl_username)
@@ -177,7 +177,7 @@ async def youtube_dl_call_back(bot, update):
         os.remove(save_ytdl_json_path)
         end_one = datetime.now()
         time_taken_for_download = (end_one -start).seconds
-        file_size = Config.TG_MAX_FILE_SIZE + 1
+        file_size = TG_MAX_FILE_SIZE + 1
         download_directory_dirname = os.path.dirname(download_directory)
         download_directory_contents = os.listdir(download_directory_dirname)
         for download_directory_c in download_directory_contents:
@@ -187,7 +187,7 @@ async def youtube_dl_call_back(bot, update):
             )
             file_size = os.stat(current_file_name).st_size
         
-            if file_size > Config.TG_MAX_FILE_SIZE:
+            if file_size > TG_MAX_FILE_SIZE:
                 await update.message.edit_caption(
                     caption=Translation.RCHD_TG_API_LIMIT.format(
                         time_taken_for_download,
@@ -221,7 +221,7 @@ async def youtube_dl_call_back(bot, update):
                 # get the correct width, height, and duration for videos greater than 10MB
                 if os.path.exists(thumb_image_path):
                     width = 0
-                    height = 0
+                    height = 90
                     
                     # resize image
                     # ref: https://t.me/PyrogramChat/44663
@@ -334,7 +334,7 @@ async def youtube_dl_call_back(bot, update):
                         if os.path.exists(image):
                             if i == 0:
                                 media_album_p.append(
-                                    pyrogram.InputMediaPhoto(
+                                    InputMediaPhoto(
                                         media=image,
                                         caption=caption,
                                         parse_mode="html"
@@ -342,7 +342,7 @@ async def youtube_dl_call_back(bot, update):
                                 )
                             else:
                                 media_album_p.append(
-                                    pyrogram.InputMediaPhoto(
+                                    InputMediaPhoto(
                                         media=image
                                     )
                                 )
