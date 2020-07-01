@@ -1,4 +1,4 @@
-## [AnyDLBot](https://telegram.dog/AnyDLBot) - Clone
+## URL Uploader Bot
 ---
 
 An Open Source ALL-In-One Telegram RoBot, that can do lot of things.
@@ -10,10 +10,6 @@ An Open Source ALL-In-One Telegram RoBot, that can do lot of things.
 👉 Upload as file from any HTTP link
 
 ### Installation
-
-#### The Easiest Way
-
-**upgrade** your subscription for [@AnyDLBot](https://telegram.dog/AnyDLBot) without having to run anything on your own
 
 #### The Easy Way
 
@@ -37,10 +33,11 @@ python bot.py
 
 ## Credits, and Thanks to
 
+* [@SpEcHlDe](https://telegram.dog/ThankTelegram) for his [AnyDLBot](https://telegram.dog/AnyDLBot)
 * [Dan Tès](https://telegram.dog/haskell) for his [Pyrogram Library](https://github.com/pyrogram/pyrogram)
 * [Yoily](https://telegram.dog/YoilyL) for his [UploaditBot](https://telegram.dog/UploaditBot)
 
-- For FeedBack and Suggestions, please feel free to say in [@SpEcHlDe](https://telegram.dog/ThankTelegram)
+- For FeedBack and Suggestions, please feel free to say in [InFoTel Group](https://telegram.dog/InFoTelGroup)
 
 #### LICENSE
 - GPLv3
