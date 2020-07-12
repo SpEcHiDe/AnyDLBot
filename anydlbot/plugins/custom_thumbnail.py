@@ -4,28 +4,24 @@
 
 # the logging things
 import logging
-logging.basicConfig(
-    level=logging.DEBUG, 
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-LOGGER = logging.getLogger(__name__)
-
 import os
-from PIL import Image
-import time
-
-from anydlbot import(
-    AUTH_USERS,
-    DOWNLOAD_LOCATION
-)
-
-# the Strings used for this "thing"
-from translation import Translation
-
-from pyrogram import(
+from pyrogram import (
     Client,
     Filters
 )
+from anydlbot import (
+    AUTH_USERS,
+    DOWNLOAD_LOCATION
+)
+# the Strings used for this "thing"
+from translation import Translation
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+LOGGER = logging.getLogger(__name__)
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
 
@@ -39,7 +35,10 @@ async def save_photo(bot, update):
         )
         return
     # received single photo
-    download_location = DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + ".jpg"
+    download_location = os.path.join(
+        DOWNLOAD_LOCATION,
+        str(update.from_user.id) + ".jpg"
+    )
     await bot.download_media(
         message=update,
         file_name=download_location
@@ -60,7 +59,10 @@ async def delete_thumbnail(bot, update):
             revoke=True
         )
         return
-    download_location = DOWNLOAD_LOCATION + "/" + str(update.from_user.id)
+    download_location = os.path.join(
+        DOWNLOAD_LOCATION,
+        str(update.from_user.id)
+    )
     try:
         os.remove(download_location + ".jpg")
         # os.remove(download_location + ".json")

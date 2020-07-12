@@ -4,41 +4,34 @@
 
 # the logging things
 import logging
-logging.basicConfig(
-    level=logging.DEBUG, 
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-LOGGER = logging.getLogger(__name__)
-
-import asyncio
 import json
-import math
-import os
-import time
-
-from anydlbot import(
-        AUTH_USERS,
-        HTTP_PROXY,
-        DOWNLOAD_LOCATION,
-        DEF_THUMB_NAIL_VID_S
-)
-
-# the Strings used for this "thing"
-from translation import Translation
-
-from pyrogram import(
+from pyrogram import (
     Client,
     Filters,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     Message
 )
-logging.getLogger("pyrogram").setLevel(logging.WARNING)
-
+from anydlbot import (
+    AUTH_USERS,
+    HTTP_PROXY,
+    DOWNLOAD_LOCATION,
+    DEF_THUMB_NAIL_VID_S
+)
 from anydlbot.helper_funcs.display_progress import humanbytes
 from anydlbot.helper_funcs.help_uploadbot import DownLoadFile
 from anydlbot.helper_funcs.extract_link import get_link
 from anydlbot.helper_funcs.run_cmnd import run_shell_command
+# the Strings used for this "thing"
+from translation import Translation
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+LOGGER = logging.getLogger(__name__)
+logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
 
 @Client.on_message(Filters.regex(pattern=".*http.*"))
@@ -81,8 +74,11 @@ async def echo(bot, update: Message):
     # https://github.com/rg3/youtube-dl/issues/2630#issuecomment-38635239
     if e_response and "nonnumeric port" not in e_response:
         # logger.warn("Status : FAIL", exc.returncode, exc.output)
-        error_message = e_response.replace("please report this issue on https://yt-dl.org/bug . Make sure you are using the latest version; see  https://yt-dl.org/update  on how to update. Be sure to call youtube-dl with the --verbose flag and include its complete output.", "")
-        if "This video is only available for registered users." in error_message:
+        error_message = e_response.replace(
+            Translation.YTDL_ERROR_MESSAGE,
+            ""
+        )
+        if Translation.ISOAYD_PREMIUM_VIDEOS in error_message:
             error_message += Translation.SET_CUSTOM_USERNAME_PASSWORD
         await update.reply_text(
             text=Translation.NO_VOID_FORMAT_FOUND.format(str(error_message)),
@@ -120,27 +116,17 @@ async def echo(bot, update: Message):
                     "video", format_id, format_ext)
                 cb_string_file = "{}|{}|{}".format(
                     "file", format_id, format_ext)
-                if format_string is not None and not "audio only" in format_string:
+                if format_string and "audio only" not in format_string:
                     ikeyboard = [
                         InlineKeyboardButton(
-                            "S " + format_string + " video " + approx_file_size + " ",
+                            f"S {format_string} video  {approx_file_size} ",
                             callback_data=(cb_string_video).encode("UTF-8")
                         ),
                         InlineKeyboardButton(
-                            "D " + format_ext + " " + approx_file_size + " ",
+                            f"D {format_string} video  {approx_file_size} ",
                             callback_data=(cb_string_file).encode("UTF-8")
                         )
                     ]
-                    """if duration is not None:
-                        cb_string_video_message = "{}|{}|{}".format(
-                            "vm", format_id, format_ext)
-                        ikeyboard.append(
-                            pyrogram.InlineKeyboardButton(
-                                "VM",
-                                callback_data=(
-                                    cb_string_video_message).encode("UTF-8")
-                            )
-                        )"""
                 else:
                     # special weird case :\
                     ikeyboard = [
@@ -164,13 +150,19 @@ async def echo(bot, update: Message):
                 cb_string = "{}|{}|{}".format("audio", "320k", "mp3")
                 inline_keyboard.append([
                     InlineKeyboardButton(
-                        "MP3 " + "(" + "64 kbps" + ")", callback_data=cb_string_64.encode("UTF-8")),
+                        "MP3 " + "(" + "64 kbps" + ")",
+                        callback_data=cb_string_64.encode("UTF-8")
+                    ),
                     InlineKeyboardButton(
-                        "MP3 " + "(" + "128 kbps" + ")", callback_data=cb_string_128.encode("UTF-8"))
+                        "MP3 " + "(" + "128 kbps" + ")",
+                        callback_data=cb_string_128.encode("UTF-8")
+                    )
                 ])
                 inline_keyboard.append([
                     InlineKeyboardButton(
-                        "MP3 " + "(" + "320 kbps" + ")", callback_data=cb_string.encode("UTF-8"))
+                        "MP3 " + "(" + "320 kbps" + ")",
+                        callback_data=cb_string.encode("UTF-8")
+                    )
                 ])
         else:
             format_id = response_json["format_id"]
@@ -224,7 +216,9 @@ async def echo(bot, update: Message):
         await update.reply_photo(
             photo=thumb_image_path,
             quote=True,
-            caption=Translation.FORMAT_SELECTION.format(thumbnail) + "\n" + Translation.SET_CUSTOM_USERNAME_PASSWORD,
+            caption=Translation.FORMAT_SELECTION.format(
+                thumbnail
+            ) + "\n" + Translation.SET_CUSTOM_USERNAME_PASSWORD,
             reply_markup=reply_markup,
             parse_mode="html"
         )

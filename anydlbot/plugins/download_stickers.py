@@ -7,19 +7,18 @@ import logging
 import os
 import time
 from PIL import Image
-
-from anydlbot import(
-    AUTH_USERS,
-    DOWNLOAD_LOCATION
-)
-
-# the Strings used for this "thing"
-from translation import Translation
-
-from pyrogram import(
+from pyrogram import (
     Client,
     Filters
 )
+from anydlbot import (
+    AUTH_USERS,
+    DOWNLOAD_LOCATION
+)
+from anydlbot.helper_funcs.display_progress import progress_for_pyrogram
+# the Strings used for this "thing"
+from translation import Translation
+
 logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -27,15 +26,13 @@ logging.basicConfig(
 LOGGER = logging.getLogger(__name__)
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
-from anydlbot.helper_funcs.display_progress import progress_for_pyrogram
-
 
 @Client.on_message(Filters.sticker)
 async def DownloadStickersBot(bot, update):
     if update.from_user.id not in AUTH_USERS:
         await update.delete()
         return
-    
+
     if update.sticker.is_animated:
         await update.delete()
         return
@@ -43,7 +40,12 @@ async def DownloadStickersBot(bot, update):
     LOGGER.info(update.from_user)
     download_location = os.path.join(
         DOWNLOAD_LOCATION,
-        str(update.from_user.id) + "_DownloadStickersBot_" + str(update.from_user.id) + ".png"
+        (
+            str(update.from_user.id),
+            "_DownloadStickersBot_",
+            str(update.from_user.id),
+            ".png"
+        )
     )
     a = await update.reply_text(
         text=Translation.DOWNLOAD_START

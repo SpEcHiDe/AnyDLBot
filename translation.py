@@ -76,3 +76,11 @@ The given file name has {num} characters.
 <b>Essays Not allowed in Telegram file name!</b>
 ©️ <code>@ReNameBot</code>
 Please short your file name and try again!"""
+    YTDL_ERROR_MESSAGE = (
+        "please report this issue on https://yt-dl.org/bug . "
+        "Make sure you are using the latest version; see "
+        " https://yt-dl.org/update  on how to update. "
+        "Be sure to call youtube-dl with the --verbose flag "
+        "and include its complete output."
+    )
+    ISOAYD_PREMIUM_VIDEOS = "video is only available for registered users"

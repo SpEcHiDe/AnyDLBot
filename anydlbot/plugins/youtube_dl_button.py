@@ -4,43 +4,38 @@
 
 # the logging things
 import logging
-logging.basicConfig(
-    level=logging.DEBUG, 
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-LOGGER = logging.getLogger(__name__)
-
-import asyncio
 import json
-import math
 import os
 import shutil
 import time
 from datetime import datetime
-
-from anydlbot import(
-    DOWNLOAD_LOCATION,
-    TG_MAX_FILE_SIZE,
-    HTTP_PROXY
-)
-
-# the Strings used for this "thing"
-from translation import Translation
-
-from pyrogram import InputMediaPhoto
-logging.getLogger("pyrogram").setLevel(logging.WARNING)
-
-from anydlbot.helper_funcs.display_progress import (
-    progress_for_pyrogram,
-    humanbytes
-)
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 # https://stackoverflow.com/a/37631799/4723940
 from PIL import Image
+from pyrogram import InputMediaPhoto
+from anydlbot import (
+    DOWNLOAD_LOCATION,
+    TG_MAX_FILE_SIZE,
+    HTTP_PROXY
+)
+from anydlbot.helper_funcs.display_progress import (
+    progress_for_pyrogram,
+    humanbytes
+)
 from anydlbot.helper_funcs.help_Nekmo_ffmpeg import generate_screen_shots
 from anydlbot.helper_funcs.extract_link import get_link
 from anydlbot.helper_funcs.run_cmnd import run_shell_command
+# the Strings used for this "thing"
+from translation import Translation
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+LOGGER = logging.getLogger(__name__)
+logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
 
 async def youtube_dl_call_back(bot, update):
@@ -54,13 +49,16 @@ async def youtube_dl_call_back(bot, update):
     try:
         with open(save_ytdl_json_path, "r", encoding="utf8") as f:
             response_json = json.load(f)
-    except (FileNotFoundError) as e:
+    except FileNotFoundError:
         await update.message.delete()
         return False
 
-    youtube_dl_url, custom_file_name, youtube_dl_username, youtube_dl_password = get_link(
-        update.message.reply_to_message
-    )
+    youtube_dl_url, \
+        custom_file_name, \
+        youtube_dl_username, \
+        youtube_dl_password = get_link(
+            update.message.reply_to_message
+        )
     if not custom_file_name:
         custom_file_name = str(response_json.get("title")) + \
             "_" + youtube_dl_format + "." + youtube_dl_ext
@@ -124,9 +122,11 @@ async def youtube_dl_call_back(bot, update):
     t_response, e_response = await run_shell_command(command_to_exec)
     LOGGER.info(e_response)
     LOGGER.info(t_response)
-    ad_string_to_replace = "please report this issue on https://yt-dl.org/bug . Make sure you are using the latest version; see  https://yt-dl.org/update  on how to update. Be sure to call youtube-dl with the --verbose flag and include its complete output."
-    if e_response and ad_string_to_replace in e_response:
-        error_message = e_response.replace(ad_string_to_replace, "")
+    if e_response and Translation.YTDL_ERROR_MESSAGE in e_response:
+        error_message = e_response.replace(
+            Translation.YTDL_ERROR_MESSAGE,
+            ""
+        )
         await update.message.edit_caption(
             caption=error_message
         )
@@ -135,7 +135,7 @@ async def youtube_dl_call_back(bot, update):
         # LOGGER.info(t_response)
         os.remove(save_ytdl_json_path)
         end_one = datetime.now()
-        time_taken_for_download = (end_one -start).seconds
+        time_taken_for_download = (end_one - start).seconds
         file_size = TG_MAX_FILE_SIZE + 1
         download_directory_dirname = os.path.dirname(download_directory)
         download_directory_contents = os.listdir(download_directory_dirname)
@@ -145,7 +145,7 @@ async def youtube_dl_call_back(bot, update):
                 download_directory_c
             )
             file_size = os.stat(current_file_name).st_size
-        
+
             if file_size > TG_MAX_FILE_SIZE:
                 await update.message.edit_caption(
                     caption=Translation.RCHD_TG_API_LIMIT.format(
@@ -153,6 +153,7 @@ async def youtube_dl_call_back(bot, update):
                         humanbytes(file_size)
                     )
                 )
+
             else:
                 is_w_f = False
                 images = await generate_screen_shots(
@@ -167,7 +168,8 @@ async def youtube_dl_call_back(bot, update):
                 await update.message.edit_caption(
                     caption=Translation.UPLOAD_START
                 )
-                # get the correct width, height, and duration for videos greater than 10MB
+                # get the correct width, height, and duration
+                # for videos greater than 10MB
                 # ref: message from @BotSupport
                 width = 0
                 height = 0
@@ -177,7 +179,8 @@ async def youtube_dl_call_back(bot, update):
                     if metadata is not None:
                         if metadata.has("duration"):
                             duration = metadata.get('duration').seconds
-                # get the correct width, height, and duration for videos greater than 10MB
+                # get the correct width, height, and duration
+                # for videos greater than 10MB
                 if os.path.exists(thumb_image_path):
                     # https://stackoverflow.com/a/21669827/4723940
                     Image.open(thumb_image_path).convert(
@@ -231,7 +234,6 @@ async def youtube_dl_call_back(bot, update):
                         duration=duration,
                         length=width,
                         thumb=thumb_image_path,
-                        reply_to_message_id=update.message.reply_to_message.message_id,
                         progress=progress_for_pyrogram,
                         progress_args=(
                             Translation.UPLOAD_START,
@@ -250,7 +252,6 @@ async def youtube_dl_call_back(bot, update):
                         supports_streaming=True,
                         # reply_markup=reply_markup,
                         thumb=thumb_image_path,
-                        reply_to_message_id=update.message.reply_to_message.message_id,
                         progress=progress_for_pyrogram,
                         progress_args=(
                             Translation.UPLOAD_START,
@@ -284,7 +285,7 @@ async def youtube_dl_call_back(bot, update):
                                     )
                                 )
                             i = i + 1
-                await update.message.reply_media_group(\
+                await update.message.reply_media_group(
                     media=media_album_p,
                     disable_notification=True
                 )

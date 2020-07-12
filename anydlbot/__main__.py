@@ -4,16 +4,15 @@
 
 # the logging things
 import logging
-
 import os
+from pyrogram import Client
 from anydlbot import (
     APP_ID,
     API_HASH,
-    TG_BOT_TOKEN,
-    DOWNLOAD_LOCATION
+    DOWNLOAD_LOCATION,
+    TG_BOT_TOKEN
 )
 
-from pyrogram import Client
 
 logging.basicConfig(
     level=logging.DEBUG,
