@@ -1,4 +1,4 @@
-class Translation(object):
+class Translation:
     START_TEXT = """This is an @AnyDLBot clone created using the Open Source code available.
 Source Code: https://github.com/SpEcHiDe/AnyDLBot
 © @AnyDLBot"""
