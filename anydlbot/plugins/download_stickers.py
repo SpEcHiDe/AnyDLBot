@@ -12,18 +12,19 @@ LOGGER = logging.getLogger(__name__)
 
 import os
 import time
+from PIL import Image
 
 from anydlbot import(
-        AUTH_USERS,
-        DOWNLOAD_LOCATION
+    AUTH_USERS,
+    DOWNLOAD_LOCATION
 )
 
 # the Strings used for this "thing"
 from translation import Translation
 
 from pyrogram import(
-        Client,
-        Filters
+    Client,
+    Filters
 )
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
@@ -36,17 +37,21 @@ async def DownloadStickersBot(bot, update):
         await update.delete()
         return
     
+    if update.sticker.is_animated:
+        await update.delete()
+        return
+
     LOGGER.info(update.from_user)
-    download_location = DOWNLOAD_LOCATION + "/" + str(update.from_user.id) + "_DownloadStickersBot_" + str(update.from_user.id) + ".png"
-    a = await bot.send_message(
-        chat_id=update.chat.id,
-        text=Translation.DOWNLOAD_START,
-        reply_to_message_id=update.message_id
+    download_location = os.path.join(
+        DOWNLOAD_LOCATION,
+        str(update.from_user.id) + "_DownloadStickersBot_" + str(update.from_user.id) + ".png"
+    )
+    a = await update.reply_text(
+        text=Translation.DOWNLOAD_START
     )
     try:
         c_time = time.time()
-        the_real_download_location = await bot.download_media(
-            message=update,
+        the_real_download_location = await update.download(
             file_name=download_location,
             progress=progress_for_pyrogram,
             progress_args=(
@@ -56,25 +61,25 @@ async def DownloadStickersBot(bot, update):
             )
         )
     except (ValueError) as e:
-        await bot.edit_message_text(
-            text=str(e),
-            chat_id=update.chat.id,
-            message_id=a.message_id
+        await a.edit_text(
+            text=str(e)
         )
         return False
-    await bot.edit_message_text(
-        text=Translation.SAVED_RECVD_DOC_FILE,
-        chat_id=update.chat.id,
-        message_id=a.message_id
+    await a.edit_text(
+        text=Translation.SAVED_RECVD_DOC_FILE
     )
+    # https://stackoverflow.com/a/21669827/4723940
+    Image.open(the_real_download_location).convert(
+        "RGB"
+    ).save(the_real_download_location)
+    #
     c_time = time.time()
-    await bot.send_document(
-        chat_id=update.chat.id,
+    await a.reply_document(
         document=the_real_download_location,
         # thumb=thumb_image_path,
         # caption=description,
         # reply_markup=reply_markup,
-        reply_to_message_id=a.message_id,
+        # reply_to_message_id=a.message_id,
         progress=progress_for_pyrogram,
         progress_args=(
             Translation.UPLOAD_START,
@@ -82,27 +87,18 @@ async def DownloadStickersBot(bot, update):
             c_time
         )
     )
-    try:
-        await bot.send_photo(
-            chat_id=update.chat.id,
-            photo=the_real_download_location,
-            # thumb=thumb_image_path,
-            # caption=description,
-            # reply_markup=reply_markup,
-            reply_to_message_id=a.message_id,
-            progress=progress_for_pyrogram,
-            progress_args=(
-                Translation.UPLOAD_START,
-                a,
-                c_time
-            )
+    await a.reply_photo(
+        photo=the_real_download_location,
+        # thumb=thumb_image_path,
+        # caption=description,
+        # reply_markup=reply_markup,
+        # reply_to_message_id=a.message_id,
+        progress=progress_for_pyrogram,
+        progress_args=(
+            Translation.UPLOAD_START,
+            a,
+            c_time
         )
-    except:
-        pass
-    os.remove(the_real_download_location)
-    await bot.edit_message_text(
-        text=Translation.AFTER_SUCCESSFUL_UPLOAD_MSG,
-        chat_id=update.chat.id,
-        message_id=a.message_id,
-        disable_web_page_preview=True
     )
+    os.remove(the_real_download_location)
+    await a.delete()

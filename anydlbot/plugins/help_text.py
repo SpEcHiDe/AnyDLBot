@@ -16,8 +16,8 @@ import os
 from translation import Translation
 
 from pyrogram import(
-        Client,
-        Filters
+    Client,
+    Filters
 )
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
