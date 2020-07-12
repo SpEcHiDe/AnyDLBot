@@ -195,9 +195,8 @@ async def youtube_dl_call_back(bot, update):
                 start_time = time.time()
                 # try to upload file
                 if tg_send_type == "audio":
-                    await bot.send_audio(
-                        chat_id=update.message.chat.id,
-                        audio=download_directory,
+                    await update.message.reply_audio(
+                        audio=current_file_name,
                         caption=description,
                         parse_mode="HTML",
                         duration=duration,
@@ -205,7 +204,6 @@ async def youtube_dl_call_back(bot, update):
                         # title=response_json["title"],
                         # reply_markup=reply_markup,
                         thumb=thumb_image_path,
-                        reply_to_message_id=update.message.reply_to_message.message_id,
                         progress=progress_for_pyrogram,
                         progress_args=(
                             Translation.UPLOAD_START,
@@ -214,14 +212,12 @@ async def youtube_dl_call_back(bot, update):
                         )
                     )
                 elif tg_send_type == "file":
-                    await bot.send_document(
-                        chat_id=update.message.chat.id,
-                        document=download_directory,
+                    await update.message.reply_document(
+                        document=current_file_name,
                         thumb=thumb_image_path,
                         caption=description,
                         parse_mode="HTML",
                         # reply_markup=reply_markup,
-                        reply_to_message_id=update.message.reply_to_message.message_id,
                         progress=progress_for_pyrogram,
                         progress_args=(
                             Translation.UPLOAD_START,
@@ -230,9 +226,8 @@ async def youtube_dl_call_back(bot, update):
                         )
                     )
                 elif tg_send_type == "vm":
-                    await bot.send_video_note(
-                        chat_id=update.message.chat.id,
-                        video_note=download_directory,
+                    await update.message.reply_video_note(
+                        video_note=current_file_name,
                         duration=duration,
                         length=width,
                         thumb=thumb_image_path,
@@ -245,9 +240,8 @@ async def youtube_dl_call_back(bot, update):
                         )
                     )
                 elif tg_send_type == "video":
-                    await bot.send_video(
-                        chat_id=update.message.chat.id,
-                        video=download_directory,
+                    await update.message.reply_video(
+                        video=current_file_name,
                         caption=description,
                         parse_mode="HTML",
                         duration=duration,
@@ -290,21 +284,15 @@ async def youtube_dl_call_back(bot, update):
                                     )
                                 )
                             i = i + 1
-                await bot.send_media_group(
-                    chat_id=update.message.chat.id,
-                    disable_notification=True,
-                    reply_to_message_id=update.message.message_id,
-                    media=media_album_p
+                await update.message.reply_media_group(\
+                    media=media_album_p,
+                    disable_notification=True
                 )
             #
-            try:
-                shutil.rmtree(tmp_directory_for_each_user)
-                os.remove(thumb_image_path)
-            except:
-                pass
-            await bot.edit_message_text(
-                text=Translation.AFTER_SUCCESSFUL_UPLOAD_MSG_WITH_TS.format(time_taken_for_download, time_taken_for_upload),
-                chat_id=update.message.chat.id,
-                message_id=update.message.message_id,
-                disable_web_page_preview=True
+            shutil.rmtree(
+                tmp_directory_for_each_user,
+                ignore_errors=True
             )
+            os.remove(thumb_image_path)
+
+            await update.message.delete()
