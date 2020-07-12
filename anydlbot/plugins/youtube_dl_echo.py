@@ -119,7 +119,7 @@ async def echo(bot, update: Message):
                 if format_string and "audio only" not in format_string:
                     ikeyboard = [
                         InlineKeyboardButton(
-                            f"S {format_string} video  {approx_file_size} ",
+                            f"S {format_string} video  {format_ext} ",
                             callback_data=(cb_string_video).encode("UTF-8")
                         ),
                         InlineKeyboardButton(
