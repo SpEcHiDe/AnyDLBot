@@ -179,6 +179,10 @@ async def youtube_dl_call_back(bot, update):
                             duration = metadata.get('duration').seconds
                 # get the correct width, height, and duration for videos greater than 10MB
                 if os.path.exists(thumb_image_path):
+                    # https://stackoverflow.com/a/21669827/4723940
+                    Image.open(thumb_image_path).convert(
+                        "RGB"
+                    ).save(thumb_image_path)
                     metadata = extractMetadata(createParser(thumb_image_path))
                     if metadata.has("width"):
                         width = metadata.get("width")
