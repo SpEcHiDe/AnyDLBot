@@ -1,5 +1,6 @@
 import os
 
+
 class Config(object):
     # get a token from @BotFather
     TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN", "")
@@ -18,9 +19,13 @@ class Config(object):
     CHUNK_SIZE = 128
     PROCESS_MAX_TIMEOUT = 3600
     # default thumbnail to be used in the videos
-    DEF_THUMB_NAIL_VID_S = os.environ.get("DEF_THUMB_NAIL_VID_S", "https://placehold.it/90x90")
+    DEF_THUMB_NAIL_VID_S = os.environ.get(
+        "DEF_THUMB_NAIL_VID_S",
+        "https://placehold.it/90x90"
+    )
     # proxy for accessing youtube-dl in GeoRestricted Areas
-    # Get your own proxy from https://github.com/rg3/youtube-dl/issues/1091#issuecomment-230163061
+    # Get your own proxy from
+    # https://github.com/rg3/youtube-dl/issues/1091#issuecomment-230163061
     HTTP_PROXY = os.environ.get("HTTP_PROXY", None)
     # maximum message length in Telegram
     MAX_MESSAGE_LENGTH = 4096

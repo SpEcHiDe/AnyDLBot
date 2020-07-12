@@ -4,12 +4,6 @@
 
 # the logging things
 import logging
-logging.basicConfig(
-    level=logging.DEBUG, 
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-LOGGER = logging.getLogger(__name__)
-
 import os
 import time
 from PIL import Image
@@ -26,6 +20,11 @@ from pyrogram import(
     Client,
     Filters
 )
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+LOGGER = logging.getLogger(__name__)
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
 from anydlbot.helper_funcs.display_progress import progress_for_pyrogram

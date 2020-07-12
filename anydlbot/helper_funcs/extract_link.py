@@ -2,15 +2,6 @@
 # -*- coding: utf-8 -*-
 # (c) Shrimadhav U K
 
-# the logging things
-import logging
-logging.basicConfig(
-    level=logging.DEBUG, 
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-LOGGER = logging.getLogger(__name__)
-
-
 from pyrogram import Message
 
 
@@ -34,9 +25,9 @@ def get_link(update: Message):
                 if entity.type == "text_link":
                     url = entity.url
                 elif entity.type == "url":
-                    o = entity.offset
-                    l = entity.length
-                    url = url[o:o + l]
+                    o_ = entity.offset
+                    l_ = entity.length
+                    url = url[o_:o_ + l_]
         if url is not None:
             url = url.strip()
         if file_name is not None:
@@ -46,15 +37,15 @@ def get_link(update: Message):
             youtube_dl_username = youtube_dl_username.strip()
         if youtube_dl_password is not None:
             youtube_dl_password = youtube_dl_password.strip()
-        LOGGER.info(url)
-        LOGGER.info(file_name)
+        # LOGGER.info(url)
+        # LOGGER.info(file_name)
     else:
         for entity in update.entities:
             if entity.type == "text_link":
                 url = entity.url
             elif entity.type == "url":
-                o = entity.offset
-                l = entity.length
-                url = url[o:o + l]
-    
+                o_ = entity.offset
+                l_ = entity.length
+                url = url[o_:o_ + l_]
+
     return url, file_name, youtube_dl_username, youtube_dl_password
