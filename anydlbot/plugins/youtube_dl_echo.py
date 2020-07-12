@@ -27,19 +27,22 @@ from anydlbot import(
 from translation import Translation
 
 from pyrogram import(
-        Client,
-        Filters,
-        InlineKeyboardButton,
-        InlineKeyboardMarkup
+    Client,
+    Filters,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Message
 )
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
 from anydlbot.helper_funcs.display_progress import humanbytes
 from anydlbot.helper_funcs.help_uploadbot import DownLoadFile
+from anydlbot.helper_funcs.extract_link import get_link
+from anydlbot.helper_funcs.run_cmnd import run_shell_command
 
 
 @Client.on_message(Filters.regex(pattern=".*http.*"))
-async def echo(bot, update):
+async def echo(bot, update: Message):
     if update.from_user.id not in AUTH_USERS:
         await update.delete()
         return
@@ -49,47 +52,7 @@ async def echo(bot, update):
     #     action="typing"
     # )
     LOGGER.info(update.from_user)
-    url = update.text
-    youtube_dl_username = None
-    youtube_dl_password = None
-    file_name = None
-    if "|" in url:
-        url_parts = url.split("|")
-        if len(url_parts) == 2:
-            url = url_parts[0]
-            file_name = url_parts[1]
-        elif len(url_parts) == 4:
-            url = url_parts[0]
-            file_name = url_parts[1]
-            youtube_dl_username = url_parts[2]
-            youtube_dl_password = url_parts[3]
-        else:
-            for entity in update.entities:
-                if entity.type == "text_link":
-                    url = entity.url
-                elif entity.type == "url":
-                    o = entity.offset
-                    l = entity.length
-                    url = url[o:o + l]
-        if url is not None:
-            url = url.strip()
-        if file_name is not None:
-            file_name = file_name.strip()
-        # https://stackoverflow.com/a/761825/4723940
-        if youtube_dl_username is not None:
-            youtube_dl_username = youtube_dl_username.strip()
-        if youtube_dl_password is not None:
-            youtube_dl_password = youtube_dl_password.strip()
-        LOGGER.info(url)
-        LOGGER.info(file_name)
-    else:
-        for entity in update.entities:
-            if entity.type == "text_link":
-                url = entity.url
-            elif entity.type == "url":
-                o = entity.offset
-                l = entity.length
-                url = url[o:o + l]
+    url, _, youtube_dl_username, youtube_dl_password = get_link(update)
     if HTTP_PROXY is not None:
         command_to_exec = [
             "youtube-dl",
@@ -114,18 +77,7 @@ async def echo(bot, update):
         command_to_exec.append("--password")
         command_to_exec.append(youtube_dl_password)
     # logger.info(command_to_exec)
-    process = await asyncio.create_subprocess_exec(
-        *command_to_exec,
-        # stdout must a pipe to be accessible as process.stdout
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    # Wait for the subprocess to finish
-    stdout, stderr = await process.communicate()
-    e_response = stderr.decode().strip()
-    # logger.info(e_response)
-    t_response = stdout.decode().strip()
-    # logger.info(t_response)
+    t_response, e_response = await run_shell_command(command_to_exec)
     # https://github.com/rg3/youtube-dl/issues/2630#issuecomment-38635239
     if e_response and "nonnumeric port" not in e_response:
         # logger.warn("Status : FAIL", exc.returncode, exc.output)

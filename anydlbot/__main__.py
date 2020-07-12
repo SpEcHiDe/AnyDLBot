@@ -12,10 +12,10 @@ LOGGER = logging.getLogger(__name__)
 
 import os
 from anydlbot import(
-        APP_ID,
-        API_HASH,
-        TG_BOT_TOKEN,
-        DOWNLOAD_LOCATION
+    APP_ID,
+    API_HASH,
+    TG_BOT_TOKEN,
+    DOWNLOAD_LOCATION
 )
 
 from pyrogram import Client
