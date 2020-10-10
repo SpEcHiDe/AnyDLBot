@@ -1,7 +1,0 @@
-aiohttp
-hachoir
-Pillow
-https://github.com/pyrogram/pyrogram/archive/asyncio-dev.zip
-requests
-tgcrypto
-youtube-dl
