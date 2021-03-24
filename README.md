@@ -4,7 +4,7 @@
 An ~~Open Source~~ ALL-In-One Telegram RoBot, that can do lot of things.
 👉 check the 'branches' for all the features..!
 
-## Please use the `Releases` TAB, above to deploy this application!
+## Please use the [Releases](https://github.com/SpEcHiDe/AnyDLBot/releases) TAB, above to deploy this application!
 
 ## Credits, and Thanks to
 
